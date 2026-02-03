@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Customer Management</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+   
+body {
+    margin: 0;
+    font-family: tahoma, sans-serif;
+    background: #ffffff;
+}
+
+.container {
+     width: 900px;
+    background: #ffffff;
+    padding: 40px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.08);
+    border-radius: 12px;
+
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+
+.main-area {
+    margin-left: 230px;        /* Sidebar space */
+    height: 100vh;
+    display: flex;
+    justify-content: center;   /* 🔥 CENTER horizontally */
+    align-items: flex-start;   /* top alignment */
+    padding-top: 60px;
+}
+
+.container h2 {
+    display: inline-block;
+    background: linear-gradient(to right, #07AFC0, #1aa853);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 28px;
+    margin-bottom: 30px;
+    font-weight: bold;
+    
+}
+
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 35px;
+}
+
+.inputGroup {
+    width: 32%;
+    display: flex;
+    flex-direction: column;
+}
+
+.inputGroup label {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+
+.inputGroup input {
+    border: none;
+    background: transparent;
+    border-bottom: 3px solid #9de79d;
+    padding: 10px 5px;
+    font-size: 16px;
+    outline: none;
+}
+
+
+h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+
+.checkboxContainer {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    line-height: 28px;
+    margin-bottom: 30px;
+}
+
+.checkboxContainer label {
+    font-size: 15px;
+}
+
+
+#placeOrderBtn {
+    padding: 10px 25px;
+    background: linear-gradient(to right,#07AFC0, #1aa853);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#placeOrderBtn:hover {
+     background: linear-gradient(to right,#1aa853, #07AFC0);
+ }
+
+.orderRow {
+        background: #f5f4f4;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 20px;
+        border: 1px solid #ffffff;
+        border-left: 6px solid #34c759;
+        
+    }
+
+    .twoCol {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .left, .right {
+        width: 48%;
+    }
+
+    p {
+        margin: 4px 0;
+        font-size: 14px;
+    }
+
+    .buttons button {
+        padding: 7px 15px;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+
+    .followBtn { background: #00bfff; }
+    .completeBtn { background: #22c7a9; }
+    .deliveryBtn { background: #7ddf2e; }
+
+    .thumb {
+        font-size: 26px;
+        font-weight: bold;
+        color: green;
+        float: right;
+        margin-top: -5px;
+    }
+    
+     .sidebar img {
+    width: 150px;
+    height: auto;
+    padding-left: 40px;
+}
+.sidebar {
+    width: 230px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: linear-gradient(#34caca, #1aa853);
+    padding-top: 30px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+}
+
+/* Menu buttons */
+.sidebar a {
+    display: block;
+    padding: 12px 20px;
+    margin: 10px 15px;
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 20px;
+    transition: 0.3s;
+}
+
+/* Hover effect */
+.sidebar a:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* Logout button */
+.sidebar button {
+    display: block;
+    padding: 12px 20px;
+    margin: 10px 15px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: 0.3s;
+    background: white;
+    color: #26bfa3;
+    border-radius: 30px;
+    border: none;
+    font-weight: bold;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: #fff;
+  background-image: url(bgdot.jpeg);
+justify-content: space-between;
+}
+
+/* PAGE CONTAINER */
+ .page {
+  /* 🔴 VERY IMPORTANT */
+   width: 100%;
+  height: 100vh;
+  overflow:hidden;
+}
+
+
+
+.wave1 {
+  bottom: 15%;
+  animation: moveWave 50s linear infinite;
+}
+
+.wave-container {
+    position: fixed;
+    top: 0;
+    left: 230px;              
+    width: calc(100% - 230px);
+    height: 100vh;
+    z-index: -1;             
+    overflow: hidden;
+}
+
+ 
+@keyframes moveWave {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-25%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+#lash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+#flash.active {
+  opacity: 0.9;
+}
+.ptimg{
+    margin-left: 30px;
+    width: 70%;
+    
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    
+}
+.sidebar img {
+        width: 150px;
+        height: auto;
+        padding: 12px 20px;
+        margin-left: 5px;
+        align-items: center;
+        
+}
+</style></head>
+<body>
+    <div class="wave-container">
+    <img src="wave.jpeg" class="wave wave1">
+  </div>
+  <div id="flash"></div>
+
+    <div class="sidebar">
+            <div class="ptimg"><img src="PTlogo.jpeg" alt=""></div>
+            <br> 
+
+    <a href="home.html">Home</a>
+    <a href="employees.html">Employees</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="stock.html">Stock</a>
+    <a href="cust.html">Customers</a>
+    <a href="accounts.html">Accounts</a>
+    <a href="expenses.html">Expenses</a>
+
+    <br><br><br><br>
+
+    <button onclick="logout()">Logout</button>
+</div>
+<div class="main-area">
+    <div class="container">
+
+
+    <h2>Customer Management</h2>
+
+    <!-- Row 1 -->
+    <div class="row">
+        <div class="inputGroup">
+            <label>Customer Name</label>
+            <input type="text" id="customerName">
+        </div>
+
+        <div class="inputGroup">
+            <label>Mobile No</label>
+            <input type="text" id="mobileNo">
+        </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="row">
+        <div class="inputGroup">
+            <label>Order No</label>
+            <input type="text" id="orderNo">
+        </div>
+
+        <div class="inputGroup">
+            <label>Order Confirmed</label>
+            <input type="date" id="orderConfirmed">
+        </div>
+
+        <div class="inputGroup">
+            <label>Order Deadline</label>
+            <input type="date" id="orderDeadline">
+        </div>
+    </div>
+
+    <!-- Printing Type -->
+    <h3>Type of Printing</h3>
+
+    <div class="checkboxContainer">
+        <label><input type="checkbox" class="printType" value="Offset Printing"> Offset Printing</label>
+        <label><input type="checkbox" class="printType" value="Screen Printing"> Screen Printing</label>
+        <label><input type="checkbox" class="printType" value="Multi Colour"> Multi Colour</label>
+        <label><input type="checkbox" class="printType" value="Wedding Card"> Wedding Card</label>
+        <label><input type="checkbox" class="printType" value="Digital Printing"> Digital Printing</label>
+        <label><input type="checkbox" class="printType" value="ID Card"> ID Card</label>
+        <label><input type="checkbox" class="printType" value="Flex Printing"> Flex Printing</label>
+        <label><input type="checkbox" class="printType" value="UV Printing"> UV Printing</label>
+        <label><input type="checkbox" class="printType" value="UV Printing"> Sun Pack</label>
+        <label><input type="checkbox" class="printType" value="Others"> Others</label>
+    </div>
+
+    <button id="placeOrderBtn">Placed Order</button>
+
+    <div id="ordersList"></div>
+</div>
+</div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, query, orderBy, doc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
+    authDomain: "printech-c101a.firebaseapp.com",
+    projectId: "printech-c101a",
+    storageBucket: "printech-c101a.firebasestorage.app",
+    messagingSenderId: "629188473697",
+    appId: "1:629188473697:web:1ca8e7a5294eb9ec830b20"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const ordersCol = collection(db, "SoftwareData");
+
+  const getLoggedUser = () => {
+    const user = JSON.parse(sessionStorage.getItem("loggedUser"));
+    return user ? (user.user || user.name) : "Unknown";
+  };
+
+  // 🔥 CUSTOM ID LOGIC
+  document.getElementById("placeOrderBtn").addEventListener("click", async () => {
+    const orderNo = document.getElementById("orderNo").value.trim();
+    const custName = document.getElementById("customerName").value.trim();
+
+    if(!orderNo || !custName) { 
+      alert("Machi, Name and Order No rendume mukkiyam!"); 
+      return; 
+    }
+
+    let selectedTypes = [];
+    document.querySelectorAll(".printType:checked").forEach(t => selectedTypes.push(t.value));
+
+    const newOrder = {
+      name: custName,
+      mobile: document.getElementById("mobileNo").value,
+      orderNo: orderNo,
+      confirmed: document.getElementById("orderConfirmed").value,
+      deadline: document.getElementById("orderDeadline").value,
+      type: selectedTypes.join(", "),
+      addedBy: getLoggedUser(),
+      followedBy: "",
+      follow: false,
+      complete: false,
+      delivered: false,
+      timestamp: new Date()
+    };
+
+    try {
+      // setDoc use panni OrderNo-va document ID-ah vaikrom
+      await setDoc(doc(db, "SoftwareData", orderNo), newOrder); 
+      
+      alert("Order " + orderNo + " Placed! ✅");
+      
+      // Clear inputs
+      document.getElementById("customerName").value = "";
+      document.getElementById("mobileNo").value = "";
+      document.getElementById("orderNo").value = "";
+      document.querySelectorAll(".printType").forEach(t => t.checked = false);
+    } catch (e) { alert("Error: " + e.message); }
+  });
+
+  // DISPLAY LIST (Same as before)
+  onSnapshot(query(ordersCol, orderBy("timestamp", "desc")), (snap) => {
+    const list = document.getElementById("ordersList");
+    list.innerHTML = "";
+    snap.forEach(docSnap => {
+      const o = docSnap.data();
+      const id = docSnap.id;
+      let followSection = !o.follow ? 
+        `<button class="followBtn" onclick="updateStatus('${id}', {follow: true, followedBy: '${getLoggedUser()}'})">Follow</button>` : 
+        `<p style="color:#00bfff;"><b>Followed By:</b> ${o.followedBy}</p>`;
+
+      list.innerHTML += `
+        <div class="orderRow" style="border-left: 6px solid ${o.complete ? '#22c7a9' : '#ff4d4d'}">
+            <div class="twoCol">
+                <div class="left">
+                    <p><b>Name:</b> ${o.name}</p>
+                    <p><b>Order No:</b> ${o.orderNo}</p>
+                    <p><b>Added By:</b> ${o.addedBy}</p>
+                </div>
+                <div class="right">
+                    <p><b>Deadline:</b> ${o.deadline}</p>
+                    <p><b>Type:</b> ${o.type}</p>
+                </div>
+            </div>
+            <div class="buttons">
+                ${followSection}
+                ${!o.complete ? `<button class="completeBtn" onclick="updateStatus('${id}', {complete: true})">Complete</button>` : '<b style="color:green;">✅ Completed</b>'}
+                ${!o.delivered ? `<button class="deliveryBtn" onclick="updateStatus('${id}', {delivered: true})">Delivery</button>` : ' 👍 Delivered'}
+                <button onclick="deleteOrder('${id}')" style="background:#ff4d4d; color:white; border:none; padding:7px 15px; border-radius:6px; cursor:pointer;">Delete</button>
+            </div>
+        </div>`;
+    });
+  });
+
+  window.updateStatus = async (id, data) => { await updateDoc(doc(db, "SoftwareData", id), data); };
+  window.deleteOrder = async (id) => { if (confirm("Delete pannelama?")) await deleteDoc(doc(db, "SoftwareData", id)); };
+  window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
+</script>
+</body>
+</html>

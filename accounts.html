@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Accounts</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Tahoma, sans-serif;
+        background: #ffffff;
+        padding: 30px;
+    }
+.container {
+    position: relative;
+    width: 900px;
+    margin-left: calc(230px + (100% - 230px - 900px) / 2);
+    margin-top: 60px;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.08);
+}
+
+
+.container h2 {
+    display: inline-block;
+    background: linear-gradient(to right, #07AFC0, #1aa853);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 28px;
+    margin-bottom: 30px;
+    font-weight: bold;
+    
+}
+
+    h1 {
+        margin-left: 5%;
+        color: #67B200;
+    }
+
+    /* FORM DESIGN */
+    .form-box {
+        background: #fff;
+        width: 100%;
+       margin-top: 20PX auto;
+       margin-left: 10px;
+        padding: 25px;
+        border-radius: 12px;
+
+    }
+
+    .form-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 15px;
+    }
+
+    .form-row input {
+        flex: 1;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 15px;
+    }
+
+    button {
+        padding: 12px 20px;
+        margin-top: 8px;
+        background: linear-gradient(to right, #07AFC0, #1aa853);
+        color: white;
+        border: none;
+        font-size: 15px;
+        cursor: pointer;
+        border-radius: 6px;
+    }
+
+    .container button:hover {
+        background: linear-gradient(to right,#1aa853, #07AFC0);
+    }
+    /* TABLE */
+    table {
+        width: 100%;
+        margin-top: 30PX;
+        background: white;
+        border-collapse: collapse;
+       
+    }
+
+    th {
+        background: #f4f4f4;
+        padding: 14px;
+        color: #080808;
+        text-align: left;
+    }
+
+    td {
+        padding: 14px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-edit {
+        padding: 6px 12px;
+        background: #2196f3;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-del {
+        padding: 6px 12px;
+        background: #e53935;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .sidebar {
+    width: 230px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: linear-gradient(#34caca, #1aa853);
+    padding-top: 30px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+}
+
+/* Menu buttons */
+.sidebar a {
+    display: block;
+    padding: 12px 20px;
+    margin: 10px 15px;
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 20px;
+    transition: 0.3s;
+}
+
+/* Hover effect */
+.sidebar a:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* Logout button */
+.sidebar button {
+    display: block;
+    padding: 12px 20px;
+    margin: 10px 15px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: 0.3s;
+    background: white;
+    color: #26bfa3;
+    border-radius: 30px;
+    border: none;
+    font-weight: bold;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: #fff;
+  background-image: url(bgdot.jpeg);
+justify-content: space-between;
+}
+
+/* PAGE CONTAINER */
+ .page {
+  /* 🔴 VERY IMPORTANT */
+   width: 100%;
+  height: 100vh;
+  overflow:hidden;
+}
+
+
+
+.wave1 {
+  bottom: 15%;
+  animation: moveWave 50s linear infinite;
+}
+
+.wave-container {
+    position: fixed;
+    top: 0;
+    left: 230px;              
+    width: calc(100% - 230px);
+    height: 100vh;
+    z-index: -1;             
+    overflow: hidden;
+}
+
+ 
+@keyframes moveWave {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-25%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+#lash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+#flash.active {
+  opacity: 0.9;
+}
+.ptimg{
+    margin-left: 30px;
+    width: 70%;
+    
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    
+}
+.sidebar img {
+        width: 150px;
+        height: auto;
+        padding: 12px 20px;
+        margin-left: 5px;
+        align-items: center;
+        
+}
+/* 🔥 Only table details small */
+table td {
+    font-size: 14px;
+}
+
+</style></head>
+<body>
+    <div class="wave-container">
+    <img src="wave.jpeg" class="wave wave1">
+  </div>
+  <div id="flash"></div>
+
+    <div class="sidebar">
+            <div class="ptimg"><img src="PTlogo.jpeg" alt=""></div>
+            <br> 
+
+    <a href="home.html">Home</a>
+    <a href="employees.html">Employees</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="stock.html">Stock</a>
+    <a href="cust.html">Customers</a>
+    <a href="accounts.html">Accounts</a>
+    <a href="expenses.html">Expenses</a>
+
+    <br><br><br><br>
+
+    <button onclick="logout()">Logout</button>
+</div>
+<div class="container">
+
+<h2>Accounts</h2>
+
+<!-- =========================
+        FORM INPUT
+========================= -->
+<div class="form-box">
+
+    <div class="form-row">
+        <input type="text" id="agent" placeholder="Agent Name">
+        <input type="text" id="job" placeholder="Job Detail">
+    </div>
+
+    <div class="form-row">
+        <input type="number" id="amount" placeholder="Total Amount (Rs.)">
+        <input type="text" id="mobile" placeholder="Mobile Number">
+    </div>
+
+    <button onclick="saveAccount()">Save</button>
+    
+
+<!-- =========================
+        DISPLAY TABLE
+========================= -->
+<table>
+    <thead>
+        <tr>
+            <th>Agent</th>
+            <th>Job</th>
+            <th>Total Amount</th>
+            <th>Mobile Number</th>
+<th>Added By</th>   <!-- 🔥 -->
+<th>Actions</th>
+
+        </tr>
+    </thead>
+
+    <tbody id="accTable"></tbody>
+</table>
+
+</div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, doc, setDoc, onSnapshot, query, deleteDoc, orderBy, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
+    authDomain: "printech-c101a.firebaseapp.com",
+    projectId: "printech-c101a",
+    storageBucket: "printech-c101a.firebasestorage.app",
+    messagingSenderId: "629188473697",
+    appId: "1:629188473697:web:1ca8e7a5294eb9ec830b20"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const accCol = collection(db, "AccountsData");
+
+  let currentEditId = null;
+
+  const getLoggedUser = () => {
+    const user = JSON.parse(sessionStorage.getItem("loggedUser"));
+    return user ? (user.user || user.name) : "Unknown";
+  };
+
+  window.saveAccount = async () => {
+    const a = document.getElementById("agent").value.trim();
+    const j = document.getElementById("job").value.trim();
+    const amt = document.getElementById("amount").value.trim();
+    const mob = document.getElementById("mobile").value.trim();
+
+    if (!a || !j || !amt || !mob) return alert("Fill all details machi!");
+
+    try {
+      const docId = currentEditId ? currentEditId : a;
+      
+      const accData = {
+        agent: a,
+        job: j,
+        amount: Number(amt),
+        mobile: mob,
+        addedBy: getLoggedUser(),
+        timestamp: new Date()
+      };
+
+      if(!currentEditId) {
+        accData.followBy = "";
+        accData.doneBy = "";
+        accData.isDone = false;
+      }
+
+      await setDoc(doc(db, "AccountsData", docId), accData, { merge: true });
+
+      alert(currentEditId ? "Account Updated! ✅" : "Account Saved! ✅");
+      clearForm();
+    } catch (e) { alert("Error: " + e.message); }
+  };
+
+  onSnapshot(query(accCol, orderBy("timestamp", "desc")), (snap) => {
+    const accTable = document.getElementById("accTable");
+    accTable.innerHTML = "";
+
+    snap.forEach((docSnap) => {
+      const d = docSnap.data();
+      const id = docSnap.id;
+
+      let followText = d.followBy ? `<span style="color:#07AFC0; font-size:12px; white-space:nowrap;">👤 ${d.followBy}</span>` : 
+                       `<button onclick="updateAccountStatus('${id}', {followBy: '${getLoggedUser()}'})" style="background:#07AFC0; padding:6px 12px; font-size:11px; border:none; border-radius:4px; color:white; cursor:pointer;">Follow</button>`;
+
+      let doneText = d.isDone ? `<span style="color:#1aa853; font-size:12px; white-space:nowrap;">✅ ${d.doneBy}</span>` : 
+                     `<button onclick="updateAccountStatus('${id}', {isDone: true, doneBy: '${getLoggedUser()}'})" style="background:#1aa853; padding:6px 12px; font-size:11px; border:none; border-radius:4px; color:white; cursor:pointer;">Done</button>`;
+
+      accTable.innerHTML += `
+        <tr style="${d.isDone ? 'background-color: #f0fff0;' : ''}">
+          <td style="color: blue; cursor: pointer; font-weight: bold;" onclick="editAcc('${id}')">${d.agent}</td>
+          <td>${d.job}</td>
+          <td>Rs. ${d.amount}</td>
+          <td>${d.mobile}</td>
+          <td>${d.addedBy}</td>
+          <td>
+            <div class="actions" style="display: flex; flex-direction: row; gap: 8px; align-items: center;">
+              ${followText} ${doneText}
+              <button class="btn-edit" onclick="editAcc('${id}')" style="background:#2196f3; color:white; border:none; padding:6px 12px; font-size:11px; border-radius:4px; cursor:pointer;">Edit</button>
+              <button class="btn-del" onclick="deleteAcc('${id}')" style="background:#ff4d4d; color:white; border:none; padding:6px 12px; font-size:11px; border-radius:4px; cursor:pointer;">Del</button>
+            </div>
+          </td>
+        </tr>`;
+    });
+  });
+
+  window.editAcc = async (id) => {
+    const docSnap = await getDoc(doc(db, "AccountsData", id));
+    if (docSnap.exists()) {
+      const d = docSnap.data();
+      document.getElementById("agent").value = d.agent;
+      document.getElementById("job").value = d.job;
+      document.getElementById("amount").value = d.amount;
+      document.getElementById("mobile").value = d.mobile;
+      currentEditId = id;
+      document.querySelector(".form-box button").innerText = "Update Account";
+    }
+  };
+
+  window.updateAccountStatus = async (id, data) => {
+    await updateDoc(doc(db, "AccountsData", id), data);
+  };
+
+  window.deleteAcc = async (id) => {
+    if (confirm("Delete pannelama?")) await deleteDoc(doc(db, "AccountsData", id));
+  };
+
+  function clearForm() {
+    document.getElementById("agent").value = "";
+    document.getElementById("job").value = "";
+    document.getElementById("amount").value = "";
+    document.getElementById("mobile").value = "";
+    currentEditId = null;
+    document.querySelector(".form-box button").innerText = "Save";
+  }
+</script>
+</body>
+</html>

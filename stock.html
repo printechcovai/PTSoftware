@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Stock Management</title>
+
+<style>
+body{
+ 
+  margin: 0;
+    font-family: tahoma, sans-serif;
+    background: url('bgimg.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    overflow: hidden;
+
+
+}
+.container {
+  background: white;
+    padding: 25px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+h2{
+    display: inline-block;
+    background: linear-gradient(to right, #07AFC0, #1aa853);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom:25px;
+    font-size: 28px ;
+}
+
+/* filters */
+.filters{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:20px;
+  margin-bottom:25px;
+}
+select,input{
+  padding:10px;
+  border:none;
+  border-bottom:2px solid #2bc4ad;
+  outline:none;
+}
+
+/* save button */
+.save-btn{
+  margin-top:20px;
+  padding:10px 25px;
+  background: linear-gradient(to right, #07AFC0, #1aa853);
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+.save-btn:hover{
+  background: linear-gradient(to right,#1aa853, #07AFC0);
+}
+
+/* list */
+.item{
+  background:#f7f7f7;
+  padding:18px 22px;
+  border-radius:8px;
+  margin-bottom:15px;
+  display:grid;
+  grid-template-columns:3fr 1fr 2fr;
+  align-items:center;
+}
+
+.status.low{ color:red; font-weight:bold; }
+.status.ok{ color:green; font-weight:bold; }
+
+.buttons{
+  display:flex;
+  align-items:center;
+}
+.buttons button{
+  margin-left:8px;
+  padding:6px 16px;
+  border:none;
+  border-radius:5px;
+  color:#fff;
+  cursor:pointer;
+}
+.delete{background:#ec0202}
+.follow{background:#11a9cf}
+.donebtn{background:#7eca03}
+
+.tick{
+  margin-left:12px;
+  font-size:20px;
+  color:green;
+  font-weight:bold;
+}
+  .sidebar {
+    width: 230px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: linear-gradient(#34caca, #1aa853);  /* same as your screenshot */
+    padding-top: 30px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+}
+
+/* Logo */
+
+
+/* Menu buttons */
+.sidebar a {
+    display: block;
+    padding: 12px 20px;
+    margin: 10px 15px;
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 20px;
+    transition: 0.3s;
+}
+
+/* Hover effect */
+.sidebar a:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* Logout button */
+.sidebar button {
+    display: block;
+    padding: 12px 20px;
+    margin: 10px 15px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: 0.3s;
+    background: white;
+    color: #26bfa3;
+    border-radius: 30px;
+    border: none;
+    font-weight: bold;
+}
+
+
+.main-content {
+    margin-left: 230px;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 25px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: #fff;
+  background-image: url(bgdot.jpeg);
+justify-content: space-between;
+}
+
+/* PAGE CONTAINER */
+ 
+
+.wave1 {
+  bottom: 15%;
+  animation: moveWave 50s linear infinite;
+}
+
+
+.wave-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+
+/* ANIMATION */
+ 
+@keyframes moveWave {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-25%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+
+#flash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+#flash.active {
+  opacity: 0.9;
+}
+#available,
+#required{
+  width: 100px;     /* size chinnadha */
+  padding: 6px;
+  font-size: 14px;
+}
+
+/* WAVE BACKGROUND */
+.ptimg{
+    margin-left: 30px;
+    width: 70%;
+    
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    
+}
+.sidebar img {
+        width: 150px;
+        height: auto;
+        padding: 12px 20px;
+        margin-left: 5px;
+        align-items: center;
+        
+}
+.followedUnder {
+  font-size: 14px;
+  color: #333;
+  margin-top: 5px;
+  display: inline-block;
+}
+.item small-box {
+  width: 80px;
+}
+.item span.qty {
+  display: inline-block;
+  min-width: 70px;
+  padding: 3px 6px;
+  background: #eaeaea;
+  border-radius: 5px;
+  font-size: 13px;
+}
+.qty-line {
+  font-size: 13px;   /* 👈 size குறைஞ்சது */
+  color: #444;
+}
+
+</style>
+<body>
+    <div class="wave-container">
+    <img src="wave.jpeg" class="wave wave1"><div id="flash"></div>
+  </div>
+    <div class="sidebar">
+    <div class="ptimg"><img src="PTlogo.jpeg" alt=""></div>
+    <br>
+
+    <a href="home.html">Home</a>
+    <a href="employees.html">Employees</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="stock.html">Stock</a>
+    <a href="cust.html">Customers</a>
+    <a href="accounts.html">Accounts</a>
+    <a href="expenses.html">Expenses</a>
+
+    <br><br><br><br>
+
+    <button onclick="logout()">Logout</button>
+</div>
+
+
+
+<div class="main-content">
+<div class="container">
+
+<h2>Stock Management</h2>
+
+<!-- FILTER DROPDOWNS -->
+<div class="filters">
+  <select onchange="setItemName(this)">
+    <option value="">A4 Size</option>
+    <option>80 GSM Paper</option>
+    <option>80 GSM Bond paper</option>
+    <option>100 GSM Paper</option>
+    <option>100 GSM Bond Paper</option>
+    <option>Colour Paper Pink</option>
+    <option>Colour Paper Yellow</option>
+    <option>Colour Paper Green</option>
+    <option>Colour Paper Blue</option>
+    <option>Photo Sheet</option>
+    <option>OHP Sheet</option>
+    <option>Tracing Sheet</option>
+    <option>Tracing Film</option>
+    <option>Loan Card Common</option>
+    <option>Loan Card Hindu</option>
+    <option>80 GSM Paper(Legal)</option>
+    <option>80 GSM Ledger Paper(Legal)</option>
+  </select>
+
+  <select onchange="setItemName(this)">
+    <option value="">A3 Size</option>
+    <option>80 GSM Paper</option>
+    <option>80 GSM Bond paper</option>
+    <option>100 GSM Paper</option>
+    <option>100 GSM Bond Paper</option>
+    <option>Photo Sheet</option>
+    <option>OHP Sheet</option>
+    <option>Tracing Sheet</option>
+    <option>Tracing Film</option>
+  </select>
+
+  <select onchange="setItemName(this)">
+    <option value="">12" x 18" (inches)</option>
+    <option>Semi Glossy Sticker</option>
+    <option>130 GSM Art Paper</option>
+    <option>170 GSM Art Paper</option>
+    <option>250 GSM Art Board</option>
+    <option>300 GSM Art Board</option>
+    <option>350 GSM Art Board</option>
+  </select>
+
+  <select onchange="setItemName(this)">
+    <option value="">13" x 19" (inches)</option>
+    <option>Semi Glossy Sticker</option>
+    <option>Heavy Glossy ( Brand: Bright Star )</option>
+    <option>Mirror Cot Sticker</option>
+    <option>PVC White Sticker</option>
+    <option>Clear Sticker</option>
+    <option>Silver Sticker</option>
+    <option>Gold Sticker</option>
+    <option>130 GSM Art Paper</option>
+    <option>170 GSM Art Paper</option>
+    <option>250 GSM Art Board</option>
+    <option>300 GSM Art Board</option>
+    <option>350 GSM Art Board</option>
+    <option>Syndetic Tin 125 Micron</option>
+    <option>Syndetic Tik 250 Micron</option>
+    <option>Needle Point</option>
+    <option>Criss Cross</option>
+    <option>Lenin White</option>
+    <option>Lenin Puff</option>
+    <option>Metallic Silver</option>
+    <option>Metallic Gold</option>
+    <option>Metallic Gold Perfume 5018</option>
+  </select>
+
+  <select onchange="setItemName(this)">
+    <option value="">Thermal Lamination</option>
+    <option>Glossy Roll</option>
+    <option>Matt Roll</option>
+    <option>Velvet Roll</option>
+    <option>Gold Foil Roll</option>
+    <option>Silver Foil Roll</option>
+    <option>UV Roll</option>
+  </select>
+
+  <select onchange="setItemName(this)">
+    <option value="">Pouch Lamination</option>
+    <option>ID Card ( 350 Micron )</option>
+    <option>A6 Size ( 125 Micron )</option>
+    <option>A6 Size ( 175 Micron )</option>
+    <option>A5 Size ( 125 Micron )</option>
+    <option>A5 Size ( 175 Micron )</option>
+    <option>A4 Size ( 125 Micron )</option>
+    <option>A4 Size ( 175 Micron )</option>
+    <option>A3 Size ( 125 Micron )</option>
+    <option>A3 Size ( 175 Micron )</option>
+  </select>
+
+  <select onchange="setItemName(this)">
+    <option value="">Tools / Toners</option>
+    <option>HP Toner (B&W)</option>
+    <option>Canon Toner (B&W)</option>
+    <option>Xerox Toner</option>
+    <option>Konica Minolta Toner</option>
+    <option>PLT Blade</option>
+    <option>PLT Holder</option>
+    <option>PLT Strips</option>
+    <option>Spiral Sheet</option>
+    <option>Spiral Ring ( Small )</option>
+    <option>Spiral Ring ( Medium )</option>
+    <option>Spiral Ring ( Large )</option>
+    <option>Wiro Ring ( 4.8 )</option>
+    <option>Wiro Ring ( 6.4 )</option>
+    <option>Wiro Ring ( 7.9 )</option>
+    <option>Wiro Ring ( 9.5 )</option>
+    <option>Wiro Ring ( 11.1 )</option>
+    <option>Wiro Ring ( 12.7 )</option>
+    <option>Wiro Ring ( 14.3 )</option>
+    <option>Wiro Ring ( 16 )</option>
+    <option>Wiro Ring ( 19 )</option>
+    <option>Wiro Ring ( 22.2 )</option>
+    <option>Wiro Ring ( 25.4 )</option>
+    <option>Wiro Ring ( 28.5 )</option>
+    <option>Wiro Ring ( 31.8 )</option>
+    <option>Stapler 24/6</option>
+    <option>Stapler 26/6</option>
+    <option>Stapler 23/6</option>
+    <option>Stapler 23/8</option>
+    <option>Stapler 23/10</option>
+    <option>Stapler 23/13</option>
+    <option>Stapler 23/15</option>
+    <option>Stapler 23/17</option>
+    <option>Stapler 23/20</option>
+    <option>Stapler 23/24</option>
+    <option>Corner Cut Die</option>
+    <option>Corner Cut Bed</option>
+    <option>Hole Punch Tool</option>
+    <option>Eyelet Sliver</option>
+    <option>Eyelet Gold</option>
+    <option>Eyelet Copper</option>
+    <option>IP</option>
+    <option>Thinner</option>
+    <option>Blanket Refresh</option>
+  </select>
+
+  <select onchange="setItemName(this)">
+    <option value="">Packing</option>
+    <option>Scoring Blade Holder</option>
+    <option>Scoring Blade</option>
+    <option>1 Inch Tape</option>
+    <option>3 Inch Tape</option>
+    <option>10" x 14" Size PP Cover</option>
+    <option>16" x 22"  Size PP Cover</option>
+    <option>Bond Glue</option>
+    <option>Binding Glue</option>
+    <option>Stapler Pin</option>
+    <option>Wrapping Sheet</option>
+    <option>Wedding Card Box</option>
+    <option>Business Card Box</option>
+    <option>Business Card Wrapping</option>
+    <option>Thanks Card</option>
+  </select>
+</div>
+
+<!-- ENTRY -->
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:20px;">
+  <input type="text" id="itemName" placeholder="Item Name" readonly>
+  <input type="number" id="available" placeholder="Available">
+  <input type="number" id="required" placeholder="Required">
+</div>
+
+<button class="save-btn" onclick="saveStock(event)">Place Order</button>
+
+<hr style="margin:30px 0">
+<div id="list"></div>
+</div>
+</div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, doc, updateDoc, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
+    authDomain: "printech-c101a.firebaseapp.com",
+    projectId: "printech-c101a",
+    storageBucket: "printech-c101a.firebasestorage.app",
+    messagingSenderId: "629188473697",
+    appId: "1:629188473697:web:1ca8e7a5294eb9ec830b20"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const stockCol = collection(db, "StockData");
+
+  const getUsername = () => {
+    try {
+      const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
+      return loggedUser ? (loggedUser.user || loggedUser.name) : "Admin";
+    } catch(e) { return "Admin"; }
+  };
+
+  window.setItemName = (sel) => {
+    const itemNameInput = document.getElementById("itemName");
+    if (sel.value !== "") {
+      const category = sel.options[0].text; 
+      itemNameInput.value = category + " : " + sel.value;
+      document.querySelectorAll("select").forEach(s => { if (s !== sel) s.value = ""; });
+    }
+  };
+
+  window.saveStock = async (e) => {
+    if (e) e.preventDefault(); 
+
+    const name = document.getElementById("itemName").value;
+    const avl = document.getElementById("available").value;
+    const req = document.getElementById("required").value;
+
+    if (!name || !avl || !req) return alert("Machi, details fill pannu!");
+
+    try {
+      const now = new Date();
+      const timeStr = now.toLocaleDateString('en-GB') + " " + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      await addDoc(stockCol, {
+        item: name,
+        avl: parseInt(avl),
+        req: parseInt(req),
+        status: parseInt(avl) < parseInt(req) ? "Low" : "OK",
+        addedBy: getUsername(),
+        followedBy: "",
+        done: false,
+        dateTime: timeStr,
+        timestamp: now
+      });
+
+      alert("Order Placed Successfully!");
+      document.getElementById("itemName").value = "";
+      document.getElementById("available").value = "";
+      document.getElementById("required").value = "";
+    } catch (error) { 
+      alert("Save aagala machi! Reason: " + error.message); 
+    }
+  };
+
+  window.followStock = async (id) => {
+    await updateDoc(doc(db, "StockData", id), { followedBy: getUsername() });
+  };
+
+  window.markAsDone = async (id) => {
+    await updateDoc(doc(db, "StockData", id), { done: true, status: "OK" });
+  };
+
+  window.deleteStock = async (id) => {
+    if (confirm("Kandippa delete pannelama?")) {
+      await deleteDoc(doc(db, "StockData", id));
+    }
+  };
+
+  window.logout = () => {
+    sessionStorage.clear();
+    window.location.href = "login.html";
+  };
+
+  onSnapshot(query(stockCol, orderBy("timestamp", "desc")), (snap) => {
+    const listDiv = document.getElementById("list");
+    listDiv.innerHTML = "";
+
+    snap.forEach(docSnap => {
+      const s = docSnap.data();
+      const id = docSnap.id;
+      // Border color based on current status
+      let borderCol = s.done ? "#28a745" : (s.followedBy ? "#11a9cf" : "#ff4444");
+
+      listDiv.innerHTML += `
+        <div style="background:white; margin-bottom:15px; padding:20px; border-radius:12px; border-left:10px solid ${borderCol}; display:grid; grid-template-columns: 2fr 1fr 1.5fr; align-items:center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+          
+          <div>
+            <h4 style="margin:0 0 5px 0; color:#333; font-size:17px;">${s.item}</h4>
+            <p style="margin:0; font-size:14px; color:#666;">Available: <b>${s.avl}</b> | Required: <b>${s.req}</b></p>
+            <p style="margin:5px 0 0 0; font-size:11px; color:#999;">By: ${s.addedBy}</p>
+          </div>
+
+          <div style="text-align:center;">
+            ${s.done ? 
+                '<b style="color:#28a745; font-size:14px; background:#e8f5e9; padding:5px 12px; border-radius:15px;">👍 DONE</b>' : 
+                (s.followedBy ? 
+                    `<div style="display:flex; flex-direction:column; align-items:center;">
+                        <b style="color:#11a9cf; font-size:13px; background:#e1f5fe; padding:4px 10px; border-radius:15px; margin-bottom:4px;">In Progress</b>
+                        <small style="font-size:10px; color:#555;">Followed: ${s.followedBy}</small>
+                    </div>` : 
+                    (s.status=='Low' ? '<b style="color:#ff4444; font-size:13px; background:#ffebee; padding:5px 12px; border-radius:15px;">LOW STOCK</b>' : '<b style="color:#28a745; font-size:13px; background:#e8f5e9; padding:5px 12px; border-radius:15px;">OK</b>')
+                )
+            }
+          </div>
+
+          <div style="text-align:right;">
+            <div class="buttons" style="display:flex; justify-content:flex-end; gap:6px;">
+               ${!s.done && !s.followedBy ? `<button onclick="followStock('${id}')" style="background:#11a9cf; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px;">Follow</button>` : ''}
+               ${!s.done ? `<button onclick="markAsDone('${id}')" style="background:#82cd00; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px;">Done</button>` : ''}
+               <button onclick="deleteStock('${id}')" style="background:#ff4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px;">Del</button>
+            </div>
+          </div>
+
+        </div>`;
+    });
+  });
+</script>
+</body>
+</html>
+

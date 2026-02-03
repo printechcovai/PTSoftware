@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+
+    <style>
+    
+
+body {
+  
+        margin: 0;
+        font-family: 'Times New Roman', Times, serif;
+        background: url('bgimg.jpeg');
+        background-size: auto;
+        background-position: center;
+        height: 100vh;
+       margin: 0;
+    font-family: 'Times New Roman', Times, serif;
+    background: url('bgimg.jpeg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;               /* center horizontally & vertically */
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+
+    
+    overflow: hidden;   /* 🔥 THIS stops scrolling */
+     /* Full screen height */
+
+
+}
+
+
+
+/* LOGIN PAGE */
+.login-card {
+    width: 350px;
+    height: 450px;
+    background: white;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    padding: 40px;
+    border-radius: 12px;
+  
+   
+}
+.login-card h1{
+    background: linear-gradient(to right, #0699ee, #1cf31c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 30px;
+    font-family: tahoma ,sans-serif;
+    font-weight: normal;
+    text-align:left;
+}
+ .login-card h2{
+    background: linear-gradient(to right, #0699ee, #1cf31c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 30px;
+    font-family: tahoma,sans-serif;
+    text-align:left;
+}
+
+.login-card img{
+    width: 120px;
+    margin-bottom: 20px;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    border: none;
+    border-bottom: 2px solid #b3d8d1; }
+
+
+
+.login-card button{
+    
+    border: none;
+    color: white;
+    font-size: 16px;
+    margin-top: 20px;
+    font-weight: bold;
+    background: linear-gradient(to right,  #07a2d1, #77cf12);
+    cursor: pointer;
+    width: 200px;   
+    height: 35px;  
+    font-size: 16px;
+    padding: 6px 14px;
+  font-size: 16px;
+  border-radius: 10px;
+}
+#loginBtn:hover{
+  background: linear-gradient(to right,  #77cf12, #07a2d1);
+}
+.error {
+    color: red;
+    display: none;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: #fff;
+  background-image: url(bgdot.jpeg);
+justify-content: space-between;
+width: auto;
+}
+
+/* PAGE CONTAINER */
+ .page {
+  position: relative; /* 🔴 VERY IMPORTANT */
+   width: 100%;
+  height: 100vh;
+  overflow:hidden;
+}
+
+/* WAVE BACKGROUND */
+ .wave1 {
+  bottom: 15%;
+  animation: moveWave 50s linear infinite;
+}
+
+
+.wave-container {
+    position: fixed;
+    top: 0;
+               
+    
+    height: 100vh;
+                
+    overflow: hidden;
+}
+
+@keyframes moveWave {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-25%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+
+#flash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+#flash.active {
+  opacity: 0.9;
+}
+
+.page.active {
+    
+     position: absolute;
+    top: 20%;
+    left: 40%;
+    transform: none;
+    
+    
+}
+
+    </style>
+</head>
+
+<body>
+<div class="wave-container">
+    <img src="wave.jpeg" class="wave wave1"><div id="flash"></div>
+  </div>
+    
+    
+    <div id="loginPage" class="page active">
+        <div class="login-card">
+            <img src="PTlogo.jpeg" alt=""><br><br>
+            <h1>Hello,</h1>
+            <h2>Welcome!</h2>
+            <br>
+
+            <input type="text" id="loginUser" placeholder="Username">
+            <input type="password" id="loginPass" placeholder="Password">
+
+            <p id="loginError" class="error" >Invalid user or password</p>
+
+            <button id="loginBtn" onclick="checkLogin()">Login</button>
+
+        </div>
+    </div>
+    
+
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, getDocs, query, where, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
+    authDomain: "printech-c101a.firebaseapp.com",
+    projectId: "printech-c101a",
+    storageBucket: "printech-c101a.firebasestorage.app",
+    messagingSenderId: "629188473697",
+    appId: "1:629188473697:web:1ca8e7a5294eb9ec830b20"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.checkLogin = async () => {
+    let u = document.getElementById("loginUser").value.trim();
+    let p = document.getElementById("loginPass").value.trim();
+    let errorMsg = document.getElementById("loginError");
+
+    // helper function to save login log with Unique Username ID
+    const saveLoginLog = async (userData) => {
+      try {
+        const userId = userData.user || userData.name;
+        // setDoc use panni Username-ah unique document name-ah vaikrom
+        await setDoc(doc(db, "LoginHistory", userId), {
+          user: userId,
+          role: userData.role,
+          loginTime: new Date().toLocaleString(),
+          timestamp: new Date()
+        });
+      } catch (err) { console.error("History store error:", err); }
+    };
+
+    // 1. MASTER LOGIN
+    if (u === "admin" && p === "1234") {
+      let master = { name: "Admin", user: "admin", role: "Founder" };
+      await saveLoginLog(master); 
+      sessionStorage.setItem("loggedUser", JSON.stringify(master));
+      window.location.href = "home.html";
+      return;
+    }
+
+    // 2. EMPLOYEE LOGIN
+    try {
+      const q = query(collection(db, "EmployeesData"), where("user", "==", u), where("pass", "==", p));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        let userData = querySnapshot.docs[0].data();
+        await saveLoginLog(userData); 
+        sessionStorage.setItem("loggedUser", JSON.stringify(userData));
+        window.location.href = "home.html";
+      } else {
+        errorMsg.style.display = "block";
+      }
+    } catch (e) {
+      console.error("Login Error: ", e);
+      alert("Check your connection!");
+    }
+  };
+</script>
+</body>
+
+</html>

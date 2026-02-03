@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard</title>
+<style>
+    body {
+    margin: 0;
+    font-family: 'Times New Roman', Times, serif;
+    background: url('bgdot.jpeg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+}
+
+    /* Sidebar */
+    
+
+
+    /* Main Content */
+   .content {
+    margin-left: 230px;
+    width: calc(100% - 230px);
+
+    min-height: 100vh;
+    display: flex;
+
+    justify-content: center;     /* center horizontally */
+    align-items: center;         /* center vertically */
+
+    padding: 0;                  /* remove top padding */
+    position: relative;
+}
+
+
+   .content {
+    margin-left: 230px;
+    width: calc(100% - 230px);
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 0;
+}
+
+
+.home-box {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+    /* Card Style Exact Match */
+  .card {
+    width: 420px;
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.15);
+
+    margin: 0 !important;   /* force remove all margins */
+}
+
+
+
+    .card h2 {
+        margin: 0;
+      display: inline-block;
+    background: linear-gradient(to right, #07AFC0, #1aa853);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+        font-size: 28px;
+    }
+.card h3 {
+display: inline-block;
+    background: linear-gradient(to right, #07AFC0, #1aa853);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 32px;
+}
+    /* Data Row */
+    .row {
+        margin-top: 40px;
+    }
+
+    .label {
+        font-size: 16px;
+        display: inline-block;
+        width: 70%;
+    }
+
+    .value {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .line {
+        width: 100%;
+        border-bottom: 1px solid #ddd;
+        margin-top: 5px;
+    }
+
+    .view-btn {
+        margin-top: 12px;
+        background: linear-gradient(to right, #07AFC0, #1aa853);
+        border: none;
+        color: white;
+        padding: 6px 25px;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .view-btn:hover {
+        background: linear-gradient(to right,#1aa853, #07AFC0);
+    }
+    .sidebar {
+    width: 230px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: linear-gradient(#34caca, #1aa853);
+    padding-top: 30px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+}
+
+
+
+
+.sidebar a {
+    display: block;
+    padding: 12px 20px;
+    margin: 10px 15px;
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 20px;
+    transition: 0.3s;
+    
+
+}
+
+
+    .sidebar button {
+        display: block;
+    padding: 12px 20px;
+    margin: 10px 15px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: 0.3s;
+        background: white;
+        color: #26bfa3;
+        border-radius: 30px;
+        border: none;
+        font-weight: bold;
+        margin-bottom: 20px;
+        transition: 0.3s;
+    }
+
+.sidebar a:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+
+
+/* PAGE CONTAINER */
+ 
+
+.wave1 {
+  bottom: 15%;
+  animation: moveWave 50s linear infinite;
+}
+
+
+.wave-container {
+    position: fixed;
+    top: 0;
+    left: 230px;              
+    width: calc(100% - 230px);
+    height: 100vh;
+    z-index: -1;             
+    overflow: hidden;
+}
+
+
+/* ANIMATION */
+ 
+@keyframes moveWave {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-25%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+
+#flash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+#flash.active {
+  opacity: 0.9;
+}
+.ptimg{
+    margin-left: 30px;
+    width: 70%;
+    
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    
+}
+.sidebar img {
+        width: 150px;
+        height: auto;
+        padding: 12px 20px;
+        margin-left: 5px;
+        align-items: center;
+        
+}
+
+</style>
+</head>
+<body>
+<div class="wave-container">
+    <img src="wave.jpeg" class="wave wave1"><div id="flash"></div>
+  </div>
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="ptimg"><img src="PTlogo.jpeg" alt=""></div> 
+    <br>
+     <a href="home.html">Home</a>
+    <a href="employees.html">Employees</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="stock.html">Stock</a>
+    <a href="cust.html">Customers</a>
+    <a href="accounts.html">Accounts</a>
+    <a href="expenses.html">Expenses</a><br><br><br><br>
+
+    <button onclick="logout()">Logout</button>
+</div>
+
+
+
+
+<!-- HOME PAGE -->
+<div id="home" class="content active">
+    <div class="home-box">
+        <div class="card">
+    <h2>Hi,</h2><br>
+    <h3 id="empUserDisplay"></h3>
+
+
+
+        <div class="row">
+            <span class="label">Employees Logged In</span>
+            <span class="value" id="empCount">00</span>
+            <div class="line"></div><br>
+            <a class="view-btn" href="attendance.html">View</a>
+            
+        </div>
+
+        <div class="row">
+            <span class="label">Stocks Required</span>
+            <span class="value" id="urgentStockCount">00</span>
+            <div class="line"></div><br>
+            <a class="view-btn" href="stock.html">View</a>
+        </div>
+
+        <div class="row">
+            <span class="label">Pending Customers</span>
+            <span class="value" id="pendingCustomerCount">00</span>
+            <div class="line"></div><br>
+            <a class="view-btn" href="cust.html">View</a>
+            <!-- <button class="view-btn">View</button> -->
+        </div>
+    </div>
+</div>
+</div>
+
+
+<!-- OTHER PAGES -->
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // 1. Unnodaya Correct Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
+    authDomain: "printech-c101a.firebaseapp.com",
+    projectId: "printech-c101a",
+    storageBucket: "printech-c101a.firebasestorage.app",
+    messagingSenderId: "629188473697",
+    appId: "1:629188473697:web:1ca8e7a5294eb9ec830b20"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // --- Session Check ---
+    let logged = JSON.parse(sessionStorage.getItem("loggedUser"));
+    if (logged) {
+        document.getElementById("empUserDisplay").innerText = logged.user || logged.name;
+    } else {
+        window.location.href = "login.html";
+    }
+
+    // --- 2. LIVE EMPLOYEE COUNT ---
+    // Attendance collection-la ippo present-ah irukuravangala count pannum
+    // Assumption: 'Attendance' collection-la 'status' field 'Present' nu iruku
+    onSnapshot(collection(db, "AttendanceData"), (snap) => {
+    let count = 0;
+    
+    // Machi, un attendance page 'DD-MM-YYYY' format use pandradhala ingayum adhey format venum
+    const now = new Date();
+    const d = String(now.getDate()).padStart(2, '0');
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const y = now.getFullYear();
+    const todayStr = `${d}-${m}-${y}`; // Result: 02-02-2026
+
+    snap.forEach(doc => {
+        const a = doc.data();
+        // Inniku date-la yaarellaam "Present" status-la irukkaangalo avangala count pannum
+        if(a.date === todayStr && a.status === "Present") {
+            count++;
+        }
+    });
+
+    const empElem = document.getElementById("empCount");
+    if(empElem) {
+        empElem.innerText = count.toString().padStart(2, '0');
+    }
+});
+
+    // --- 3. LIVE STOCK COUNT ---
+    const stockQuery = query(collection(db, "StockData"), where("status", "==", "Low"), where("done", "==", false));
+    onSnapshot(stockQuery, (snap) => {
+        document.getElementById("urgentStockCount").innerText = snap.size.toString().padStart(2, '0');
+        document.getElementById("urgentStockCount").style.color = snap.size > 0 ? "red" : "black";
+    });
+
+    // --- 4. LIVE PENDING CUSTOMERS ---
+    // Collection name 'SoftwareData'-nu un code-la irukku, adhaiye use pannirukaen
+    onSnapshot(collection(db, "SoftwareData"), (snap) => {
+        let pendingCount = 0;
+        snap.forEach(doc => {
+            if(doc.data().complete === false) pendingCount++;
+        });
+        document.getElementById("pendingCustomerCount").innerText = pendingCount.toString().padStart(2, '0');
+        document.getElementById("pendingCustomerCount").style.color = pendingCount > 0 ? "red" : "black";
+    });
+  });
+
+  window.logout = () => {
+    sessionStorage.clear();
+    window.location.href = "login.html";
+  };
+</script>
+</body>
+</html>
