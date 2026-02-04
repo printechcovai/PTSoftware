@@ -5,22 +5,27 @@
 <title>Accounts</title>
 
 <style>
-     body {
-        margin: 0;
-        font-family: Tahoma, sans-serif;
-        background: #ffffff;
-        padding: 30px;
-    }
-.container {
-    position: relative;
-    width: 900px;
-    margin-left: calc(230px + (100% - 230px - 900px) / 2);
-    margin-top: 60px;
-    background: #ffffff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 0 25px rgba(0,0,0,0.08);
+     html, body {
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden;   /* ✅ only x hide */
+  overflow-y: hidden;   /* page scroll venam */
+  font-family: Tahoma, sans-serif;
+  background-image: url(bgdot.jpeg);
 }
+.container {
+  position: relative;
+  width: 900px;
+  max-height: calc(100vh - 60px); /* 🔥 screen fit */
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.08);
+
+  z-index: 1;
+  overflow-y: auto;   /* ✅ ONLY SCROLL HERE */
+}
+
 
 
 .container h2 {
@@ -172,63 +177,54 @@
   font-family: Arial, sans-serif;
 }
 
-body {
-  height: 100vh;
-  background: #fff;
-  background-image: url(bgdot.jpeg);
-justify-content: space-between;
-}
-
 /* PAGE CONTAINER */
- .page {
-  /* 🔴 VERY IMPORTANT */
-   width: 100%;
+.page-wrap {
+  margin-left: 230px;
+  width: calc(100% - 230px);
   height: 100vh;
-  overflow:hidden;
-}
-
-
-
-.wave1 {
-  bottom: 15%;
-  animation: moveWave 50s linear infinite;
+  display: flex;
+  justify-content: center;
+  padding: 30px 0;
+  overflow: hidden;   /* 🔥 page scroll block */
 }
 
 .wave-container {
-    position: fixed;
-    top: 0;
-    left: 230px;              
-    width: calc(100% - 230px);
-    height: 100vh;
-    z-index: -1;             
-    overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 230px;
+  width: calc(100% - 230px);
+  height: 100vh;
+  overflow: hidden;
+  z-index: 0;          /* 🔥 -1 REMOVE */
+  pointer-events: none;
 }
 
- 
-@keyframes moveWave {
+
+.wave-track {
+  position: absolute;
+  bottom: 7%;
+  display: flex;
+  width: 200%;
+  animation: waveMove 35s linear infinite;
+  
+}
+
+.wave {
+  width: 100%;
+  height: auto;
+  flex-shrink: 0;
+}
+
+/* PERFECT seamless animation */
+@keyframes waveMove {
   0% {
     transform: translateX(0);
   }
-  50% {
-    transform: translateX(-25%);
-  }
   100% {
-    transform: translateX(0);
+    transform: translateX(-50%);
   }
 }
 
-#lash {
-  position: fixed;
-  inset: 0;
-  background: white;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-}
-
-#flash.active {
-  opacity: 0.9;
-}
 .ptimg{
     margin-left: 30px;
     width: 70%;
@@ -254,10 +250,11 @@ table td {
 </style></head>
 <body>
     <div class="wave-container">
-    <img src="Software.png" class="wave wave1">
+  <div class="wave-track">
+    <img src="Software.png" class="wave">
+    <img src="Software.png" class="wave">
   </div>
-  <div id="flash"></div>
-
+</div>
     <div class="sidebar">
             <div class="ptimg"><img src="PTlogo.png" alt=""></div>
             <br> 
@@ -274,6 +271,7 @@ table td {
 
     <button onclick="logout()">Logout</button>
 </div>
+<div class="page-wrap">
 <div class="container">
 
 <h2>Accounts</h2>
@@ -310,10 +308,11 @@ table td {
     </thead>
 
     <tbody id="accTable"></tbody>
-</table>
-
-</div>
+</table><br>
 <button onclick="exportAccounts()" style="background: #1aa853; margin-left: 10px;">📥 Export Accounts</button>
+</div>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, doc, setDoc, onSnapshot, query, deleteDoc, orderBy, getDoc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";

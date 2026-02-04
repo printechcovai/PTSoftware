@@ -113,7 +113,7 @@ body {
 
 body {
   height: 100vh;
-  background: #fff;
+  
   background-image: url(bgdot.jpeg);
 justify-content: space-between;
 width: auto;
@@ -127,53 +127,45 @@ width: auto;
   overflow:hidden;
 }
 
-/* WAVE BACKGROUND */
- .wave1 {
-  bottom: 15%;
-  animation: moveWave 50s linear infinite;
-}
-
-
 .wave-container {
-    position: fixed;
-    top: 0;
-               
-    
-    height: 100vh;
-                
-    overflow: hidden;
+  position: fixed;
+  top: 0;
+  
+  width: calc(100% );
+  height: 100vh;
+  overflow: hidden;
+  z-index: -1;
 }
 
-@keyframes moveWave {
+.wave-track {
+  position: absolute;
+  bottom: -10%;
+  display: flex;
+  width: 200%;
+  animation: waveMove 35s linear infinite;
+}
+
+.wave {
+  width: 100%;
+  height: auto;
+  flex-shrink: 0;
+}
+
+/* PERFECT seamless animation */
+@keyframes waveMove {
   0% {
     transform: translateX(0);
   }
-  50% {
-    transform: translateX(-25%);
-  }
   100% {
-    transform: translateX(0);
+    transform: translateX(-50%);
   }
 }
 
-
-#flash {
-  position: fixed;
-  inset: 0;
-  background: white;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-}
-
-#flash.active {
-  opacity: 0.9;
-}
 
 .page.active {
     
      position: absolute;
-    top: 20%;
+    top: 15%;
     left: 40%;
     transform: none;
     
@@ -185,9 +177,12 @@ width: auto;
 
 <body>
 <div class="wave-container">
-    <img src="Software.png" class="wave wave1"><div id="flash"></div>
+  <div class="wave-track">
+    <img src="Software.png" class="wave">
+    <img src="Software.png" class="wave">
   </div>
-    
+</div>
+
     
     <div id="loginPage" class="page active">
         <div class="login-card">

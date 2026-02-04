@@ -56,20 +56,25 @@
         background: linear-gradient(to right,#1aa853, #07AFC0);
     }
 
-   .page-wrap {
-    margin-left: 230px;              /* sidebar width */
-    width: calc(100% - 230px);       /* remaining space */
-    display: flex;
-    justify-content: center;         /* center horizontally */
-    padding: 40px 0;                 /* top-bottom spacing */
+ .page-wrap {
+  margin-left: 230px;
+  width: calc(100% - 230px);
+  height: 100vh;              /* 🔥 full screen */
+  display: flex;
+  justify-content: center;
+  padding: 30px 0;
+  overflow: hidden;           /* page scroll block */
 }
 
 .container {
-    width: 900px;
-    background: #fff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 0 25px rgba(0,0,0,0.08);
+  width: 900px;
+  max-height: calc(100vh - 60px);  /* 🔥 screen fit */
+  background: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.08);
+
+  overflow-y: auto;   /* ✅ ONLY HERE SCROLL */
 }
 
 
@@ -197,46 +202,40 @@ justify-content: space-between;
 
 
 
-.wave1 {
-  bottom: 15%;
-  animation: moveWave 50s linear infinite;
-}
-
 .wave-container {
-    position: fixed;
-    top: 0;
-    left: 230px;              
-    width: calc(100% - 230px);
-    height: 100vh;
-    z-index: -1;             
-    overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 230px;
+  width: calc(100% - 230px);
+  height: 100vh;
+  overflow: hidden;
+  z-index: -1;
 }
 
- 
-@keyframes moveWave {
+.wave-track {
+  position: absolute;
+  bottom: 7%;
+  display: flex;
+  width: 200%;
+  animation: waveMove 35s linear infinite;
+}
+
+.wave {
+  width: 100%;
+  height: auto;
+  flex-shrink: 0;
+}
+
+/* PERFECT seamless animation */
+@keyframes waveMove {
   0% {
     transform: translateX(0);
   }
-  50% {
-    transform: translateX(-25%);
-  }
   100% {
-    transform: translateX(0);
+    transform: translateX(-50%);
   }
 }
 
-#flash {
-  position: fixed;
-  inset: 0;
-  background: white;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-}
-
-#flash.active {
-  opacity: 0.9;
-}
 .ptimg{
     margin-left: 30px;
     width: 70%;
@@ -257,9 +256,11 @@ justify-content: space-between;
 </style></head>
 <body>
     <div class="wave-container">
-    <img src="Software.png" class="wave1">
+  <div class="wave-track">
+    <img src="Software.png" class="wave">
+    <img src="Software.png" class="wave">
   </div>
-  <div id="flash"></div>
+</div>
 
     <div class="sidebar">
             <div class="ptimg"><img src="PTlogo.png" alt=""></div>

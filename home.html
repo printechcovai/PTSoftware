@@ -178,51 +178,40 @@ display: inline-block;
 
 /* PAGE CONTAINER */
  
-
-.wave1 {
-  bottom: 15%;
-  animation: moveWave 50s linear infinite;
-}
-
-
 .wave-container {
-    position: fixed;
-    top: 0;
-    left: 230px;              
-    width: calc(100% - 230px);
-    height: 100vh;
-    z-index: -1;             
-    overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 230px;
+  width: calc(100% - 230px);
+  height: 100vh;
+  overflow: hidden;
+  z-index: -1;
 }
 
+.wave-track {
+  position: absolute;
+  bottom: 7%;
+  display: flex;
+  width: 200%;
+  animation: waveMove 35s linear infinite;
+}
 
-/* ANIMATION */
- 
-@keyframes moveWave {
+.wave {
+  width: 100%;
+  height: auto;
+  flex-shrink: 0;
+}
+
+/* PERFECT seamless animation */
+@keyframes waveMove {
   0% {
     transform: translateX(0);
   }
-  50% {
-    transform: translateX(-25%);
-  }
   100% {
-    transform: translateX(0);
+    transform: translateX(-50%);
   }
 }
 
-
-#flash {
-  position: fixed;
-  inset: 0;
-  background: white;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-}
-
-#flash.active {
-  opacity: 0.9;
-}
 .ptimg{
     margin-left: 30px;
     width: 70%;
@@ -245,8 +234,12 @@ display: inline-block;
 </head>
 <body>
 <div class="wave-container">
-    <img src="Software.png" class="wave wave1"><div id="flash"></div>
+  <div class="wave-track">
+    <img src="Software.png" class="wave">
+    <img src="Software.png" class="wave">
   </div>
+</div>
+
 <!-- Sidebar -->
 <div class="sidebar">
     <div class="ptimg"><img src="PTlogo.png" alt=""></div> 
