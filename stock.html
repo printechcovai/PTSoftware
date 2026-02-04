@@ -263,10 +263,10 @@ justify-content: space-between;
 </style>
 <body>
     <div class="wave-container">
-    <img src="wave.jpeg" class="wave wave1"><div id="flash"></div>
+    <img src="Software.png" class="wave wave1"><div id="flash"></div>
   </div>
     <div class="sidebar">
-    <div class="ptimg"><img src="PTlogo.jpeg" alt=""></div>
+    <div class="ptimg"><img src="PTlogo.png" alt=""></div>
     <br>
 
     <a href="home.html">Home</a>
@@ -288,7 +288,6 @@ justify-content: space-between;
 <div class="container">
 
 <h2>Stock Management</h2>
-
 <!-- FILTER DROPDOWNS -->
 <div class="filters">
   <select onchange="setItemName(this)">
@@ -458,11 +457,13 @@ justify-content: space-between;
 
 <hr style="margin:30px 0">
 <div id="list"></div>
+<button class="save-btn" style="background: #1aa853; margin-left: 10px;" onclick="exportStock()">📥 Export Stock List</button>
 </div>
 </div>
 <script type="module">
+  // 1. getDocs sethuttaen, layout disturb aagaadhu
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, onSnapshot, query, doc, updateDoc, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, doc, updateDoc, deleteDoc, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
@@ -484,6 +485,7 @@ justify-content: space-between;
     } catch(e) { return "Admin"; }
   };
 
+  // --- Functions (Original logic exactly) ---
   window.setItemName = (sel) => {
     const itemNameInput = document.getElementById("itemName");
     if (sel.value !== "") {
@@ -495,67 +497,61 @@ justify-content: space-between;
 
   window.saveStock = async (e) => {
     if (e) e.preventDefault(); 
-
     const name = document.getElementById("itemName").value;
     const avl = document.getElementById("available").value;
     const req = document.getElementById("required").value;
-
     if (!name || !avl || !req) return alert("Machi, details fill pannu!");
-
     try {
       const now = new Date();
       const timeStr = now.toLocaleDateString('en-GB') + " " + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
       await addDoc(stockCol, {
-        item: name,
-        avl: parseInt(avl),
-        req: parseInt(req),
+        item: name, avl: parseInt(avl), req: parseInt(req),
         status: parseInt(avl) < parseInt(req) ? "Low" : "OK",
-        addedBy: getUsername(),
-        followedBy: "",
-        done: false,
-        dateTime: timeStr,
-        timestamp: now
+        addedBy: getUsername(), followedBy: "", done: false,
+        dateTime: timeStr, timestamp: now
       });
-
       alert("Order Placed Successfully!");
       document.getElementById("itemName").value = "";
       document.getElementById("available").value = "";
       document.getElementById("required").value = "";
-    } catch (error) { 
-      alert("Save aagala machi! Reason: " + error.message); 
-    }
+    } catch (error) { alert("Error: " + error.message); }
   };
 
-  window.followStock = async (id) => {
-    await updateDoc(doc(db, "StockData", id), { followedBy: getUsername() });
+  // --- PUDHU EXPORT LOGIC (No UI Change) ---
+  window.exportStock = async () => {
+    try {
+        const snap = await getDocs(query(stockCol, orderBy("timestamp", "desc")));
+        if (snap.empty) return alert("Export panna stock illa!");
+        let csvContent = "Item Name,Available,Required,Status,Added By,Followed By,Date Time\n";
+        snap.forEach(docSnap => {
+            const s = docSnap.data();
+            const statusText = s.done ? "DONE" : (s.followedBy ? "In Progress" : s.status);
+            csvContent += `"${s.item}",${s.avl},${s.req},${statusText},${s.addedBy},${s.followedBy || ''},${s.dateTime}\n`;
+        });
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Stock_Report.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (e) { alert("Export error!"); }
   };
 
-  window.markAsDone = async (id) => {
-    await updateDoc(doc(db, "StockData", id), { done: true, status: "OK" });
-  };
+  window.followStock = async (id) => { await updateDoc(doc(db, "StockData", id), { followedBy: getUsername() }); };
+  window.markAsDone = async (id) => { await updateDoc(doc(db, "StockData", id), { done: true, status: "OK" }); };
+  window.deleteStock = async (id) => { if (confirm("Kandippa delete pannelama?")) await deleteDoc(doc(db, "StockData", id)); };
+  window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
 
-  window.deleteStock = async (id) => {
-    if (confirm("Kandippa delete pannelama?")) {
-      await deleteDoc(doc(db, "StockData", id));
-    }
-  };
-
-  window.logout = () => {
-    sessionStorage.clear();
-    window.location.href = "login.html";
-  };
-
+  // --- Real-time List (Unga original grid layout) ---
   onSnapshot(query(stockCol, orderBy("timestamp", "desc")), (snap) => {
     const listDiv = document.getElementById("list");
     listDiv.innerHTML = "";
-
     snap.forEach(docSnap => {
       const s = docSnap.data();
       const id = docSnap.id;
-      // Border color based on current status
       let borderCol = s.done ? "#28a745" : (s.followedBy ? "#11a9cf" : "#ff4444");
-
       listDiv.innerHTML += `
         <div style="background:white; margin-bottom:15px; padding:20px; border-radius:12px; border-left:10px solid ${borderCol}; display:grid; grid-template-columns: 2fr 1fr 1.5fr; align-items:center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
           
@@ -588,6 +584,25 @@ justify-content: space-between;
 
         </div>`;
     });
+  });
+  window.addEventListener('DOMContentLoaded', () => {
+    // 1. Session-la irundhu user data-va edu
+    const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
+    
+    if (loggedUser) {
+      // 2. Role "Founder" illana Accounts & Expenses-ah maraichidu
+      if (loggedUser.role !== "Founder") {
+        // Sidebar-la irukkura Accounts & Expenses links-ah 'id' vechu kandupidi
+        const accLink = document.querySelector('a[href="employees.html"]');
+        
+        
+        if (accLink) accLink.style.display = 'none';
+        if (expLink) expLink.style.display = 'none';
+      }
+    } else {
+      // Login pannala-na veliya thallu
+      window.location.href = "login.html";
+    }
   });
 </script>
 </body>

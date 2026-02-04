@@ -264,10 +264,10 @@ justify-content: space-between;
 </style>
 <body>
     <div class="wave-container">
-    <img src="wave.jpeg" class="wave wave1"><div id="flash"></div>
+    <img src="Software.png" class="wave wave1"><div id="flash"></div>
   </div>
     <div class="sidebar">
-    <div class="ptimg"><img src="PTlogo.jpeg" alt=""></div>
+    <div class="ptimg"><img src="PTlogo.png" alt=""></div>
     <br>
 
     <a href="home.html">Home</a>
@@ -446,6 +446,25 @@ justify-content: space-between;
     if (user.role !== "Founder" && user.role !== "Admin") {
         let empLink = document.querySelector("a[href='employees.html']");
         if (empLink) empLink.style.display = "none";
+    }
+  });
+  window.addEventListener('DOMContentLoaded', () => {
+    // 1. Session-la irundhu user data-va edu
+    const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
+    
+    if (loggedUser) {
+      // 2. Role "Founder" illana Accounts & Expenses-ah maraichidu
+      if (loggedUser.role !== "Founder") {
+        // Sidebar-la irukkura Accounts & Expenses links-ah 'id' vechu kandupidi
+        const accLink = document.querySelector('a[href="employees.html"]');
+        
+        
+        if (accLink) accLink.style.display = 'none';
+        if (expLink) expLink.style.display = 'none';
+      }
+    } else {
+      // Login pannala-na veliya thallu
+      window.location.href = "login.html";
     }
   });
 </script>

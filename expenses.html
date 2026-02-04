@@ -225,7 +225,7 @@ justify-content: space-between;
   }
 }
 
-#lash {
+#flash {
   position: fixed;
   inset: 0;
   background: white;
@@ -257,14 +257,13 @@ justify-content: space-between;
 </style></head>
 <body>
     <div class="wave-container">
-    <img src="wave.jpeg" class="wave wave1">
+    <img src="Software.png" class="wave1">
   </div>
   <div id="flash"></div>
 
     <div class="sidebar">
-            <div class="ptimg"><img src="PTlogo.jpeg" alt=""></div>
+            <div class="ptimg"><img src="PTlogo.png" alt=""></div>
             <br> 
-
     <a href="home.html">Home</a>
     <a href="employees.html">Employees</a>
     <a href="attendance.html">Attendance</a>
@@ -272,16 +271,12 @@ justify-content: space-between;
     <a href="cust.html">Customers</a>
     <a href="accounts.html">Accounts</a>
     <a href="expenses.html">Expenses</a>
-
     <br><br><br><br>
-
     <button onclick="logout()">Logout</button>
 </div>
-
 <div class="page-wrap">
 <div class="container">
 <h2>Shop Expenses</h2>
-
 <!-- =========================
         FORM INPUT
 ========================= -->
@@ -318,13 +313,13 @@ justify-content: space-between;
     </thead>
 
     <tbody id="expTable"></tbody>
-</table>
+</table><br>
+<button onclick="exportExpenses()" style="background: #1aa853; margin-left: 40px;">📥 Export Expenses</button>
 </div>
-
 </div>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, doc, setDoc, onSnapshot, query, deleteDoc, orderBy, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, doc, setDoc, onSnapshot, query, deleteDoc, orderBy, getDoc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
@@ -346,13 +341,39 @@ justify-content: space-between;
     return user ? (user.user || user.name) : "Unknown";
   };
 
+  // 🔥 GLOBAL EXPORT FUNCTION FOR EXPENSES
+  window.exportExpenses = async () => {
+    try {
+        const snap = await getDocs(query(expCol, orderBy("timestamp", "desc")));
+        if (snap.empty) return alert("Expenses edhuvum illa machi!");
+
+        let csvContent = "Date,Shop Name,Item Name,Amount,Added By,Approved By,Paid By,Status\n";
+        
+        snap.forEach(docSnap => {
+            const e = docSnap.data();
+            let status = e.isPaid ? "Paid" : (e.approvedBy ? "Approved" : "Pending");
+            csvContent += `"${e.date}","${e.shop}","${e.item}","${e.amount}","${e.addedBy}","${e.approvedBy || ''}","${e.paidBy || ''}","${status}"\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `Printech_Expenses_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        alert("Expense Report Downloaded! 💸");
+    } catch (err) { alert("Export Error: " + err.message); }
+  };
+
   window.saveExpense = async () => {
     const s = document.getElementById("shopname").value.trim();
     const i = document.getElementById("itemname").value.trim();
     const a = document.getElementById("amount").value.trim();
     const d = document.getElementById("date").value;
 
-    if (!s || !i || !a || !d) return alert("Fill all details!");
+    if (!s || !i || !a || !d) return alert("Machi, ellathaiyum fill pannu!");
 
     let dt = new Date(d);
     let finalDate = dt.getDate().toString().padStart(2,'0') + "/" +
@@ -361,7 +382,6 @@ justify-content: space-between;
 
     try {
       const docId = currentEditId ? currentEditId : `${s}-${i}-${Date.now()}`.replace(/\s+/g, '');
-      
       const expenseData = {
         shop: s, item: i, amount: Number(a),
         date: finalDate, rawDate: d,
@@ -370,9 +390,7 @@ justify-content: space-between;
       };
 
       if(!currentEditId) {
-        expenseData.approvedBy = "";
-        expenseData.paidBy = "";
-        expenseData.isPaid = false;
+        expenseData.approvedBy = ""; expenseData.paidBy = ""; expenseData.isPaid = false;
       }
       
       await setDoc(doc(db, "ExpensesData", docId), expenseData, { merge: true });
@@ -381,38 +399,9 @@ justify-content: space-between;
     } catch (e) { alert("Error: " + e.message); }
   };
 
-  onSnapshot(query(expCol, orderBy("timestamp", "desc")), (snap) => {
-    const expTable = document.getElementById("expTable");
-    expTable.innerHTML = "";
-    snap.forEach((docSnap) => {
-      const e = docSnap.data();
-      const id = docSnap.id;
-
-      let approveBtn = e.approvedBy ? 
-        `<span style="color:#07AFC0; font-size:12px; white-space:nowrap;">✔️ OK: ${e.approvedBy}</span>` : 
-        `<button onclick="updateStatus('${id}', {approvedBy: '${getLoggedUser()}'})" style="background:#07AFC0; padding:6px 12px; font-size:11px; border:none; border-radius:4px; color:white; cursor:pointer;">Approve</button>`;
-
-      let paidBtn = e.isPaid ? 
-        `<span style="color:#1aa853; font-size:12px; white-space:nowrap;">💰 Paid: ${e.paidBy}</span>` : 
-        `<button onclick="updateStatus('${id}', {isPaid: true, paidBy: '${getLoggedUser()}'})" style="background:#1aa853; padding:6px 12px; font-size:11px; border:none; border-radius:4px; color:white; cursor:pointer;">Pay</button>`;
-
-      expTable.innerHTML += `
-        <tr style="${e.isPaid ? 'background-color: #f9fff9;' : ''}">
-          <td style="color: blue; cursor: pointer; font-weight: bold;" onclick="fillExpense('${id}')">${e.shop}</td>
-          <td>${e.item}</td>
-          <td>Rs. ${e.amount}</td>
-          <td>${e.date}</td>
-          <td><b>${e.addedBy}</b></td>
-          <td>
-            <div class="actions" style="display: flex; flex-direction: row; gap: 8px; align-items: center;">
-              ${approveBtn} ${paidBtn}
-              <button class="btn-edit" onclick="fillExpense('${id}')" style="padding:4px 8px; font-size:11px;">Edit</button>
-              <button class="btn-del" onclick="deleteExp('${id}')" style="padding:4px 8px; font-size:11px;">Del</button>
-            </div>
-          </td>
-        </tr>`;
-    });
-  });
+  window.updateStatus = async (id, data) => { await updateDoc(doc(db, "ExpensesData", id), data); };
+  window.deleteExp = async (id) => { if (confirm("Delete pannelama?")) await deleteDoc(doc(db, "ExpensesData", id)); };
+  window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
 
   window.fillExpense = async (id) => {
     const docSnap = await getDoc(doc(db, "ExpensesData", id));
@@ -427,14 +416,6 @@ justify-content: space-between;
     }
   };
 
-  window.updateStatus = async (id, data) => {
-    await updateDoc(doc(db, "ExpensesData", id), data);
-  };
-
-  window.deleteExp = async (id) => {
-    if (confirm("Delete pannelama?")) await deleteDoc(doc(db, "ExpensesData", id));
-  };
-
   function clearForm() {
     document.getElementById("shopname").value = "";
     document.getElementById("itemname").value = "";
@@ -443,6 +424,58 @@ justify-content: space-between;
     currentEditId = null;
     document.querySelector(".form-box button").innerText = "Save";
   }
+
+  onSnapshot(query(expCol, orderBy("timestamp", "desc")), (snap) => {
+    const expTable = document.getElementById("expTable");
+    expTable.innerHTML = "";
+    snap.forEach((docSnap) => {
+      const e = docSnap.data();
+      const id = docSnap.id;
+      const user = getLoggedUser();
+
+      let approveBtn = e.approvedBy ? 
+        `<span style="color:#07AFC0; font-size:12px;">✔️ OK: ${e.approvedBy}</span>` : 
+        `<button onclick="updateStatus('${id}', {approvedBy: '${user}'})" style="background:#07AFC0; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;">Approve</button>`;
+
+      let paidBtn = e.isPaid ? 
+        `<span style="color:#1aa853; font-size:12px;">💰 Paid: ${e.paidBy}</span>` : 
+        `<button onclick="updateStatus('${id}', {isPaid: true, paidBy: '${user}'})" style="background:#1aa853; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;">Pay</button>`;
+
+      expTable.innerHTML += `
+        <tr style="${e.isPaid ? 'background-color: #f9fff9;' : ''}">
+          <td style="color: blue; cursor: pointer; font-weight: bold;" onclick="fillExpense('${id}')">${e.shop}</td>
+          <td>${e.item}</td>
+          <td>Rs. ${e.amount}</td>
+          <td>${e.date}</td>
+          <td>${e.addedBy}</td>
+          <td>
+            <div style="display: flex; gap: 5px; align-items:center;">
+              ${approveBtn} ${paidBtn}
+              <button class="btn-del" onclick="deleteExp('${id}')" style="padding:4px 8px; font-size:10px;">Del</button>
+            </div>
+          </td>
+        </tr>`;
+    });
+  });
+  window.addEventListener('DOMContentLoaded', () => {
+    // 1. Session-la irundhu user data-va edu
+    const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
+    
+    if (loggedUser) {
+      // 2. Role "Founder" illana Accounts & Expenses-ah maraichidu
+      if (loggedUser.role !== "Founder") {
+        // Sidebar-la irukkura Accounts & Expenses links-ah 'id' vechu kandupidi
+        const accLink = document.querySelector('a[href="employees.html"]');
+        
+        
+        if (accLink) accLink.style.display = 'none';
+        if (expLink) expLink.style.display = 'none';
+      }
+    } else {
+      // Login pannala-na veliya thallu
+      window.location.href = "login.html";
+    }
+  });
 </script>
 
 </body>

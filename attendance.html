@@ -160,7 +160,7 @@ h2 {
 body {
   height: 100vh;
   background: #fff;
-  background-image: url(bgdot.jpeg);
+  background-image: url('bgdot.jpeg');
 justify-content: space-between;
 }
 
@@ -226,10 +226,10 @@ justify-content: space-between;
 </style></head>
 <body>
      <div class="wave-container">
-    <img src="wave.jpeg" class="wave wave1"><div id="flash"></div>
+    <img src="Software.png" class="wave wave1"><div id="flash"></div>
   </div>
     <div class="sidebar">
-            <div class="ptimg"><img src="PTlogo.jpeg" alt=""></div>
+            <div class="ptimg"><img src="PTlogo.png" alt=""></div>
             <br> 
 
     <a href="home.html">Home</a>
@@ -278,7 +278,7 @@ justify-content: space-between;
 </div>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, doc, setDoc, onSnapshot, query, deleteDoc, orderBy, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, deleteDoc, doc, orderBy, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
@@ -291,125 +291,121 @@ justify-content: space-between;
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const accCol = collection(db, "AccountsData");
 
-  let currentEditId = null;
-
-  const getLoggedUser = () => {
-    const user = JSON.parse(sessionStorage.getItem("loggedUser"));
-    return user ? (user.user || user.name) : "Unknown";
+  const formatTime12 = () => {
+    let now = new Date();
+    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  window.saveAccount = async () => {
-    const a = document.getElementById("agent").value.trim();
-    const j = document.getElementById("job").value.trim();
-    const amt = document.getElementById("amount").value.trim();
-    const mob = document.getElementById("mobile").value.trim();
+  // 1. Fetch Employees for Dropdown
+  onSnapshot(collection(db, "EmployeesData"), (snap) => {
+      const empSelect = document.getElementById("empSelect");
+      empSelect.innerHTML = '<option value="">Select Employee</option>';
+      snap.forEach(docSnap => {
+          const emp = docSnap.data();
+          if (emp.name) {
+              let opt = document.createElement("option");
+              opt.value = emp.name;
+              opt.textContent = emp.name;
+              empSelect.appendChild(opt);
+          }
+      });
+  });
 
-    if (!a || !j || !amt || !mob) return alert("Fill all details machi!");
+  // 2. MARK IN (New Record)
+  document.getElementById("inBtn").onclick = async () => {
+      const name = document.getElementById("empSelect").value;
+      const date = document.getElementById("attDate").value;
+      if (!name || !date) return alert("Details fill pannu machi!");
 
-    try {
-      const docId = currentEditId ? currentEditId : a;
-      const accData = {
-        agent: a, job: j, amount: Number(amt), mobile: mob,
-        addedBy: getLoggedUser(),
-        timestamp: new Date()
-      };
-
-      if(!currentEditId) {
-        accData.followBy = "";
-        accData.doneBy = "";
-        accData.isDone = false;
-      }
-
-      await setDoc(doc(db, "AccountsData", docId), accData, { merge: true });
-      alert(currentEditId ? "Account Updated! ✅" : "Account Saved! ✅");
-      clearForm();
-    } catch (e) { alert("Error: " + e.message); }
+      try {
+          await addDoc(collection(db, "AttendanceRecords"), {
+              employeeName: name,
+              date: date,
+              inTime: formatTime12(),
+              outTime: "-",
+              status: "IN",
+              timestamp: serverTimestamp()
+          });
+          alert(`${name} marked IN! ✅`);
+      } catch (e) { alert("Error: " + e.message); }
   };
 
-  onSnapshot(query(accCol, orderBy("timestamp", "desc")), (snap) => {
-    const accTable = document.getElementById("accTable");
-    accTable.innerHTML = "";
-
-    snap.forEach((docSnap) => {
-      const d = docSnap.data();
-      const id = docSnap.id;
-
-      // 1. Pending Section (Follow Logic)
-      // If pending is done (followBy exists), show user name, else show 'Pending' button
-      let pendingBtn = d.followBy ? 
-        `<span style="color:#07AFC0; font-weight:bold; font-size:12px;">👤 ${d.followBy}</span>` : 
-        `<button onclick="updateAccountStatus('${id}', {followBy: '${getLoggedUser()}'})" style="background:#07AFC0; width:75px; padding:6px; font-size:11px; border:none; border-radius:4px; color:white; cursor:pointer;">Pending</button>`;
-
-      // 2. Paid Section (Done Logic)
-      // If paid is done (isDone is true), show user name, else show 'Paid' button
-      let paidBtn = d.isDone ? 
-        `<span style="color:#1aa853; font-weight:bold; font-size:12px;">✅ ${d.doneBy}</span>` : 
-        `<button onclick="updateAccountStatus('${id}', {isDone: true, doneBy: '${getLoggedUser()}'})" style="background:#1aa853; width:75px; padding:6px; font-size:11px; border:none; border-radius:4px; color:white; cursor:pointer;">Paid</button>`;
-
-      accTable.innerHTML += `
-        <tr style="${d.isDone ? 'background-color: #f0fff0;' : ''}">
-          <td style="color: blue; cursor: pointer; font-weight: bold;" onclick="editAcc('${id}')">${d.agent}</td>
-          <td>${d.job}</td>
-          <td>Rs. ${d.amount}</td>
-          <td>${d.mobile}</td>
-          <td>${d.addedBy || 'Unknown'}</td>
-          <td>
-            <div class="actions" style="display: flex; gap: 10px; align-items: center; justify-content: center; min-width: 300px;">
-              <div style="min-width: 80px; text-align: center;">${pendingBtn}</div>
-              <div style="min-width: 80px; text-align: center;">${paidBtn}</div>
-              <button class="btn-edit" onclick="editAcc('${id}')" style="background:#2196f3; color:white; border:none; padding:6px 12px; font-size:11px; border-radius:4px; cursor:pointer;">Edit</button>
-              <button class="btn-del" onclick="deleteAcc('${id}')" style="background:#ff4d4d; color:white; border:none; padding:6px 12px; font-size:11px; border-radius:4px; cursor:pointer;">Del</button>
-            </div>
-          </td>
-        </tr>`;
-    });
-});
-
-// Mukkiyamaana function: Idhula button click panna database update aagum
-window.updateAccountStatus = async (id, data) => {
-    try {
-        const docRef = doc(db, "AccountsData", id);
-        await updateDoc(docRef, data);
-        // Alert kooda vaendam, automatic-ah refresh aagum real-time snapshot-la
-    } catch (e) {
-        console.error("Update error:", e);
-    }
-};
-
-  window.editAcc = async (id) => {
-    const docSnap = await getDoc(doc(db, "AccountsData", id));
-    if (docSnap.exists()) {
-      const d = docSnap.data();
-      document.getElementById("agent").value = d.agent;
-      document.getElementById("job").value = d.job;
-      document.getElementById("amount").value = d.amount;
-      document.getElementById("mobile").value = d.mobile;
-      currentEditId = id;
-      document.querySelector(".form-box button").innerText = "Update Account";
-      window.scrollTo(0,0);
-    }
+  // 3. MARK OUT (Card-kulla irukura button click panna)
+  window.markOut = async (id) => {
+      try {
+          const docRef = doc(db, "AttendanceRecords", id);
+          await updateDoc(docRef, {
+              outTime: formatTime12(),
+              status: "OUT"
+          });
+          alert("Marked OUT! 🚀");
+      } catch (e) { alert("Error: " + e.message); }
   };
 
-  window.updateAccountStatus = async (id, data) => {
-    try { await updateDoc(doc(db, "AccountsData", id), data); } catch (e) { }
-  };
+  // 4. DISPLAY LIST (With Dynamic Button)
+  const attList = document.getElementById("attendanceList");
+  onSnapshot(query(collection(db, "AttendanceRecords"), orderBy("timestamp", "desc")), (snap) => {
+      attList.innerHTML = "";
+      snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const id = docSnap.id;
+          
+          let card = document.createElement("div");
+          card.className = "attCard";
+          
+          // Machi, status "IN"-nu irundha mattum OUT button kaatuvom
+          const outBtnHtml = d.status === "IN" 
+              ? `<button onclick="markOut('${id}')" style="background:#07AFC0; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; margin-right:10px;">Mark OUT</button>` 
+              : "";
 
-  window.deleteAcc = async (id) => {
-    if (confirm("Delete pannelama?")) await deleteDoc(doc(db, "AccountsData", id));
-  };
+          card.innerHTML = `
+              <div class="twoCol">
+                  <div class="left">
+                      <p><b>Name:</b> ${d.employeeName}</p>
+                      <p><b>Date:</b> ${d.date}</p>
+                  </div>
+                  <div class="right">
+                      <p><b>IN Time:</b> ${d.inTime}</p>
+                      <p><b>OUT Time:</b> ${d.outTime}</p>
+                  </div>
+              </div>
+              <p><b>Status:</b> <span style="color:${d.status === 'IN' ? 'green' : 'red'}">${d.status}</span></p>
+              <div style="margin-top:10px;">
+                  ${outBtnHtml}
+                  <button class="delBtn" onclick="deleteAtt('${id}')">Delete</button>
+              </div>
+          `;
+          attList.appendChild(card);
+      });
+  });
 
-  function clearForm() {
-    document.getElementById("agent").value = "";
-    document.getElementById("job").value = "";
-    document.getElementById("amount").value = "";
-    document.getElementById("mobile").value = "";
-    currentEditId = null;
-    document.querySelector(".form-box button").innerText = "Save";
-  }
+  window.deleteAtt = async (id) => {
+      if(confirm("Delete pannelama?")) await deleteDoc(doc(db, "AttendanceRecords", id));
+  };
 
   window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
+
+  window.addEventListener('DOMContentLoaded', () => {
+    // 1. Session-la irundhu user data-va edu
+    const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
+    
+    if (loggedUser) {
+      // 2. Role "Founder" illana Accounts & Expenses-ah maraichidu
+      if (loggedUser.role !== "Founder") {
+        // Sidebar-la irukkura Accounts & Expenses links-ah 'id' vechu kandupidi
+        const accLink = document.querySelector('a[href="employees.html"]');
+        
+        
+        if (accLink) accLink.style.display = 'none';
+        if (expLink) expLink.style.display = 'none';
+      }
+    } else {
+      // Login pannala-na veliya thallu
+      window.location.href = "login.html";
+    }
+  });
 </script>
+
 </body>
 </html>

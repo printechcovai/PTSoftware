@@ -5,7 +5,7 @@
 <title>Accounts</title>
 
 <style>
-    body {
+     body {
         margin: 0;
         font-family: Tahoma, sans-serif;
         background: #ffffff;
@@ -254,12 +254,12 @@ table td {
 </style></head>
 <body>
     <div class="wave-container">
-    <img src="wave.jpeg" class="wave wave1">
+    <img src="Software.png" class="wave wave1">
   </div>
   <div id="flash"></div>
 
     <div class="sidebar">
-            <div class="ptimg"><img src="PTlogo.jpeg" alt=""></div>
+            <div class="ptimg"><img src="PTlogo.png" alt=""></div>
             <br> 
 
     <a href="home.html">Home</a>
@@ -277,7 +277,6 @@ table td {
 <div class="container">
 
 <h2>Accounts</h2>
-
 <!-- =========================
         FORM INPUT
 ========================= -->
@@ -294,8 +293,6 @@ table td {
     </div>
 
     <button onclick="saveAccount()">Save</button>
-    
-
 <!-- =========================
         DISPLAY TABLE
 ========================= -->
@@ -316,9 +313,10 @@ table td {
 </table>
 
 </div>
+<button onclick="exportAccounts()" style="background: #1aa853; margin-left: 10px;">📥 Export Accounts</button>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, doc, setDoc, onSnapshot, query, deleteDoc, orderBy, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, doc, setDoc, onSnapshot, query, deleteDoc, orderBy, getDoc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
@@ -340,6 +338,33 @@ table td {
     return user ? (user.user || user.name) : "Unknown";
   };
 
+  // 🔥 EXPORT FUNCTION (Global scope-ku window-la attach panren)
+  window.exportAccounts = async () => {
+    try {
+        const snap = await getDocs(query(accCol, orderBy("timestamp", "desc")));
+        if (snap.empty) return alert("Machi, Accounts data empty-ah irukku!");
+
+        let csvContent = "Agent Name,Job Detail,Amount,Mobile,Added By,Followed By,Done By,Status\n";
+        
+        snap.forEach(docSnap => {
+            const d = docSnap.data();
+            let status = d.isDone ? "Completed" : (d.followBy ? "In Progress" : "Pending");
+            csvContent += `"${d.agent}","${d.job}","${d.amount}","${d.mobile}","${d.addedBy}","${d.followBy || ''}","${d.doneBy || ''}","${status}"\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `Printech_Accounts_Report.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        alert("Account Report Exported! ✅");
+    } catch (e) { alert("Export Error: " + e.message); }
+  };
+
+  // 🔥 SAVE FUNCTION (Global scope)
   window.saveAccount = async () => {
     const a = document.getElementById("agent").value.trim();
     const j = document.getElementById("job").value.trim();
@@ -349,62 +374,25 @@ table td {
     if (!a || !j || !amt || !mob) return alert("Fill all details machi!");
 
     try {
-      const docId = currentEditId ? currentEditId : a;
-      
+      const docId = currentEditId ? currentEditId : (a + "_" + Date.now());
       const accData = {
-        agent: a,
-        job: j,
-        amount: Number(amt),
-        mobile: mob,
-        addedBy: getLoggedUser(),
-        timestamp: new Date()
+        agent: a, job: j, amount: Number(amt), mobile: mob,
+        addedBy: getLoggedUser(), timestamp: new Date()
       };
 
       if(!currentEditId) {
-        accData.followBy = "";
-        accData.doneBy = "";
-        accData.isDone = false;
+        accData.followBy = ""; accData.doneBy = ""; accData.isDone = false;
       }
 
       await setDoc(doc(db, "AccountsData", docId), accData, { merge: true });
-
-      alert(currentEditId ? "Account Updated! ✅" : "Account Saved! ✅");
+      alert(currentEditId ? "Updated! ✅" : "Saved! ✅");
       clearForm();
     } catch (e) { alert("Error: " + e.message); }
   };
 
-  onSnapshot(query(accCol, orderBy("timestamp", "desc")), (snap) => {
-    const accTable = document.getElementById("accTable");
-    accTable.innerHTML = "";
-
-    snap.forEach((docSnap) => {
-      const d = docSnap.data();
-      const id = docSnap.id;
-
-      let followText = d.followBy ? `<span style="color:#07AFC0; font-size:12px; white-space:nowrap;">👤 ${d.followBy}</span>` : 
-                       `<button onclick="updateAccountStatus('${id}', {followBy: '${getLoggedUser()}'})" style="background:#07AFC0; padding:6px 12px; font-size:11px; border:none; border-radius:4px; color:white; cursor:pointer;">Follow</button>`;
-
-      let doneText = d.isDone ? `<span style="color:#1aa853; font-size:12px; white-space:nowrap;">✅ ${d.doneBy}</span>` : 
-                     `<button onclick="updateAccountStatus('${id}', {isDone: true, doneBy: '${getLoggedUser()}'})" style="background:#1aa853; padding:6px 12px; font-size:11px; border:none; border-radius:4px; color:white; cursor:pointer;">Done</button>`;
-
-      accTable.innerHTML += `
-        <tr style="${d.isDone ? 'background-color: #f0fff0;' : ''}">
-          <td style="color: blue; cursor: pointer; font-weight: bold;" onclick="editAcc('${id}')">${d.agent}</td>
-          <td>${d.job}</td>
-          <td>Rs. ${d.amount}</td>
-          <td>${d.mobile}</td>
-          <td>${d.addedBy}</td>
-          <td>
-            <div class="actions" style="display: flex; flex-direction: row; gap: 8px; align-items: center;">
-              ${followText} ${doneText}
-              <button class="btn-edit" onclick="editAcc('${id}')" style="background:#2196f3; color:white; border:none; padding:6px 12px; font-size:11px; border-radius:4px; cursor:pointer;">Edit</button>
-              <button class="btn-del" onclick="deleteAcc('${id}')" style="background:#ff4d4d; color:white; border:none; padding:6px 12px; font-size:11px; border-radius:4px; cursor:pointer;">Del</button>
-            </div>
-          </td>
-        </tr>`;
-    });
-  });
-
+  // 🔥 OTHERS
+  window.updateAccountStatus = async (id, data) => { await updateDoc(doc(db, "AccountsData", id), data); };
+  window.deleteAcc = async (id) => { if (confirm("Delete pannelama?")) await deleteDoc(doc(db, "AccountsData", id)); };
   window.editAcc = async (id) => {
     const docSnap = await getDoc(doc(db, "AccountsData", id));
     if (docSnap.exists()) {
@@ -417,14 +405,7 @@ table td {
       document.querySelector(".form-box button").innerText = "Update Account";
     }
   };
-
-  window.updateAccountStatus = async (id, data) => {
-    await updateDoc(doc(db, "AccountsData", id), data);
-  };
-
-  window.deleteAcc = async (id) => {
-    if (confirm("Delete pannelama?")) await deleteDoc(doc(db, "AccountsData", id));
-  };
+  window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
 
   function clearForm() {
     document.getElementById("agent").value = "";
@@ -434,6 +415,57 @@ table td {
     currentEditId = null;
     document.querySelector(".form-box button").innerText = "Save";
   }
+
+  // 🔥 REALTIME LISTENER
+  onSnapshot(query(accCol, orderBy("timestamp", "desc")), (snap) => {
+    const accTable = document.getElementById("accTable");
+    accTable.innerHTML = "";
+    snap.forEach((docSnap) => {
+      const d = docSnap.data();
+      const id = docSnap.id;
+      const currentUser = getLoggedUser();
+
+      let followText = d.followBy ? `<span style="color:#07AFC0; font-size:12px;">👤 ${d.followBy}</span>` : 
+                       `<button onclick="updateAccountStatus('${id}', {followBy: '${currentUser}'})" style="background:#07AFC0; color:white; padding:6px; font-size:10px; border:none; border-radius:4px; cursor:pointer;">Follow</button>`;
+      
+      let doneText = d.isDone ? `<span style="color:#1aa853; font-size:12px;">✅ ${d.doneBy}</span>` : 
+                     `<button onclick="updateAccountStatus('${id}', {isDone: true, doneBy: '${currentUser}'})" style="background:#1aa853; color:white; padding:6px; font-size:10px; border:none; border-radius:4px; cursor:pointer;">Done</button>`;
+
+      accTable.innerHTML += `
+        <tr style="${d.isDone ? 'background-color: #f0fff0;' : ''}">
+          <td style="color: blue; cursor: pointer; font-weight: bold;" onclick="editAcc('${id}')">${d.agent}</td>
+          <td>${d.job}</td>
+          <td>Rs. ${d.amount}</td>
+          <td>${d.mobile}</td>
+          <td>${d.addedBy}</td>
+          <td>
+            <div style="display: flex; gap: 5px;">
+              ${followText} ${doneText}
+              <button onclick="deleteAcc('${id}')" style="background:#ff4d4d; color:white; border:none; padding:6px; font-size:10px; border-radius:4px; cursor:pointer;">Del</button>
+            </div>
+          </td>
+        </tr>`;
+    });
+  });
+  window.addEventListener('DOMContentLoaded', () => {
+    // 1. Session-la irundhu user data-va edu
+    const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
+    
+    if (loggedUser) {
+      // 2. Role "Founder" illana Accounts & Expenses-ah maraichidu
+      if (loggedUser.role !== "Founder") {
+        // Sidebar-la irukkura Accounts & Expenses links-ah 'id' vechu kandupidi
+        const accLink = document.querySelector('a[href="employees.html"]');
+        
+        
+        if (accLink) accLink.style.display = 'none';
+        if (expLink) expLink.style.display = 'none';
+      }
+    } else {
+      // Login pannala-na veliya thallu
+      window.location.href = "login.html";
+    }
+  });
 </script>
 </body>
 </html>

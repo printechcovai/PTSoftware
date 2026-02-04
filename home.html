@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Dashboard</title>
 <style>
+
     body {
     margin: 0;
     font-family: 'Times New Roman', Times, serif;
@@ -244,11 +245,11 @@ display: inline-block;
 </head>
 <body>
 <div class="wave-container">
-    <img src="wave.jpeg" class="wave wave1"><div id="flash"></div>
+    <img src="Software.png" class="wave wave1"><div id="flash"></div>
   </div>
 <!-- Sidebar -->
 <div class="sidebar">
-    <div class="ptimg"><img src="PTlogo.jpeg" alt=""></div> 
+    <div class="ptimg"><img src="PTlogo.png" alt=""></div> 
     <br>
      <a href="home.html">Home</a>
     <a href="employees.html">Employees</a>
@@ -272,6 +273,8 @@ display: inline-block;
     <h3 id="empUserDisplay"></h3>
 
 
+
+        
 
         <div class="row">
             <span class="label">Employees Logged In</span>
@@ -307,7 +310,6 @@ display: inline-block;
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // 1. Unnodaya Correct Firebase Config
   const firebaseConfig = {
     apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
     authDomain: "printech-c101a.firebaseapp.com",
@@ -321,50 +323,59 @@ display: inline-block;
   const db = getFirestore(app);
 
   document.addEventListener("DOMContentLoaded", () => {
-    // --- Session Check ---
-    let logged = JSON.parse(sessionStorage.getItem("loggedUser"));
-    if (logged) {
-        document.getElementById("empUserDisplay").innerText = logged.user || logged.name;
-    } else {
+    // --- 1. Session & Role Check ---
+    const logged = JSON.parse(sessionStorage.getItem("loggedUser"));
+    if (!logged) {
         window.location.href = "login.html";
+        return;
     }
 
-    // --- 2. LIVE EMPLOYEE COUNT ---
-    // Attendance collection-la ippo present-ah irukuravangala count pannum
-    // Assumption: 'Attendance' collection-la 'status' field 'Present' nu iruku
-    onSnapshot(collection(db, "AttendanceData"), (snap) => {
-    let count = 0;
+    document.getElementById("empUserDisplay").innerText = logged.user || logged.name;
+
+    // --- 🔐 ROLE BASED SIDEBAR HIDING ---
+    if (logged.role !== "Founder") {
+        // Founder illana restrict panna vendiya links
+        const restricted = ["employees.html"];
+        restricted.forEach(page => {
+            const link = document.querySelector(`a[href="${page}"]`);
+            if (link) link.style.display = 'none';
+        });
+    }
+
+    // --- 2. LIVE ATTENDANCE COUNT (FIXED) ---
+onSnapshot(collection(db, "AttendanceRecords"), (snap) => {
+    let presentStaffs = new Set();
     
-    // Machi, un attendance page 'DD-MM-YYYY' format use pandradhala ingayum adhey format venum
+    // Machi, system date-ah YYYY-MM-DD format-ku mathurom
     const now = new Date();
-    const d = String(now.getDate()).padStart(2, '0');
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const y = now.getFullYear();
-    const todayStr = `${d}-${m}-${y}`; // Result: 02-02-2026
+    const offset = now.getTimezoneOffset();
+    const adjustedDate = new Date(now.getTime() - (offset * 60 * 1000));
+    const todayStr = adjustedDate.toISOString().split('T')[0]; 
+
+    console.log("Checking for date:", todayStr); // Debug panna idhu use aagum
 
     snap.forEach(doc => {
         const a = doc.data();
-        // Inniku date-la yaarellaam "Present" status-la irukkaangalo avangala count pannum
-        if(a.date === todayStr && a.status === "Present") {
-            count++;
+        // Attendance Page-la status "IN"-nu irundha mattum count edukkurom
+        if(a.date === todayStr && a.status === "IN") {
+            presentStaffs.add(a.employeeName);
         }
     });
 
     const empElem = document.getElementById("empCount");
     if(empElem) {
-        empElem.innerText = count.toString().padStart(2, '0');
+        empElem.innerText = presentStaffs.size.toString().padStart(2, '0');
+        // Staffs irundha green color, illana black
+        empElem.style.color = presentStaffs.size > 0 ? "#1aa853" : "black";
     }
 });
-
     // --- 3. LIVE STOCK COUNT ---
-    const stockQuery = query(collection(db, "StockData"), where("status", "==", "Low"), where("done", "==", false));
-    onSnapshot(stockQuery, (snap) => {
+    onSnapshot(query(collection(db, "StockData"), where("status", "==", "Low")), (snap) => {
         document.getElementById("urgentStockCount").innerText = snap.size.toString().padStart(2, '0');
         document.getElementById("urgentStockCount").style.color = snap.size > 0 ? "red" : "black";
     });
 
     // --- 4. LIVE PENDING CUSTOMERS ---
-    // Collection name 'SoftwareData'-nu un code-la irukku, adhaiye use pannirukaen
     onSnapshot(collection(db, "SoftwareData"), (snap) => {
         let pendingCount = 0;
         snap.forEach(doc => {
@@ -379,6 +390,7 @@ display: inline-block;
     sessionStorage.clear();
     window.location.href = "login.html";
   };
+  
 </script>
 </body>
 </html>

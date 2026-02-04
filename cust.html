@@ -19,7 +19,6 @@ body {
     padding: 40px;
     box-shadow: 0 0 25px rgba(0,0,0,0.08);
     border-radius: 12px;
-
     max-height: calc(100vh - 120px);
     overflow-y: auto;
 }
@@ -286,12 +285,12 @@ justify-content: space-between;
 </style></head>
 <body>
     <div class="wave-container">
-    <img src="wave.jpeg" class="wave wave1">
+    <img src="Software.png" class="wave wave1">
   </div>
   <div id="flash"></div>
 
     <div class="sidebar">
-            <div class="ptimg"><img src="PTlogo.jpeg" alt=""></div>
+            <div class="ptimg"><img src="PTlogo.png" alt=""></div>
             <br> 
 
     <a href="home.html">Home</a>
@@ -362,11 +361,14 @@ justify-content: space-between;
     <button id="placeOrderBtn">Placed Order</button>
 
     <div id="ordersList"></div>
+    
+<button onclick="exportOrders()" style="padding: 10px 25px; background: #1aa853; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-left: 10px;">📥 Export Orders</button>
 </div>
 </div>
 <script type="module">
+  // 1. getDocs sethuttaen machi
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, query, orderBy, doc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, onSnapshot, query, orderBy, doc, setDoc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
@@ -386,15 +388,49 @@ justify-content: space-between;
     return user ? (user.user || user.name) : "Unknown";
   };
 
-  // 🔥 CUSTOM ID LOGIC
+  // 🔥 2. EXPORT FUNCTION (Global-ah window. use panni ezhudhunadhu)
+  window.exportOrders = async () => {
+    try {
+        console.log("Exporting..."); // Debugging-ku
+        const snap = await getDocs(query(ordersCol, orderBy("timestamp", "desc")));
+        if (snap.empty) return alert("Export panna orders edhuvum illa!");
+
+        let csvContent = "Order No,Customer Name,Mobile,Confirmed Date,Deadline,Printing Type,Added By,Followed By,Status\n";
+        
+        snap.forEach(docSnap => {
+            const o = docSnap.data();
+            let status = o.delivered ? "Delivered" : (o.complete ? "Completed" : (o.follow ? "In Progress" : "Pending"));
+            
+            // CSV formatting (comma handle panna quotes use pandrom)
+            csvContent += `"${o.orderNo}","${o.name}","${o.mobile}","${o.confirmed}","${o.deadline}","${o.type}","${o.addedBy}","${o.followedBy || ''}","${status}"\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Customer_Orders_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        alert("Report Downloaded Successfully! ✅");
+    } catch (e) {
+        alert("Export error machi: " + e.message);
+    }
+  };
+
+  // --- Other Window Functions ---
+  window.updateStatus = async (id, data) => { await updateDoc(doc(db, "SoftwareData", id), data); };
+  window.deleteOrder = async (id) => { if (confirm("Delete pannelama?")) await deleteDoc(doc(db, "SoftwareData", id)); };
+  window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
+
+  // --- Place Order Button Logic ---
   document.getElementById("placeOrderBtn").addEventListener("click", async () => {
     const orderNo = document.getElementById("orderNo").value.trim();
     const custName = document.getElementById("customerName").value.trim();
 
-    if(!orderNo || !custName) { 
-      alert("Machi, Name and Order No rendume mukkiyam!"); 
-      return; 
-    }
+    if(!orderNo || !custName) return alert("Machi, Name and Order No rendume mukkiyam!");
 
     let selectedTypes = [];
     document.querySelectorAll(".printType:checked").forEach(t => selectedTypes.push(t.value));
@@ -415,12 +451,9 @@ justify-content: space-between;
     };
 
     try {
-      // setDoc use panni OrderNo-va document ID-ah vaikrom
       await setDoc(doc(db, "SoftwareData", orderNo), newOrder); 
-      
       alert("Order " + orderNo + " Placed! ✅");
       
-      // Clear inputs
       document.getElementById("customerName").value = "";
       document.getElementById("mobileNo").value = "";
       document.getElementById("orderNo").value = "";
@@ -428,7 +461,7 @@ justify-content: space-between;
     } catch (e) { alert("Error: " + e.message); }
   });
 
-  // DISPLAY LIST (Same as before)
+  // --- Display List Logic ---
   onSnapshot(query(ordersCol, orderBy("timestamp", "desc")), (snap) => {
     const list = document.getElementById("ordersList");
     list.innerHTML = "";
@@ -461,10 +494,25 @@ justify-content: space-between;
         </div>`;
     });
   });
-
-  window.updateStatus = async (id, data) => { await updateDoc(doc(db, "SoftwareData", id), data); };
-  window.deleteOrder = async (id) => { if (confirm("Delete pannelama?")) await deleteDoc(doc(db, "SoftwareData", id)); };
-  window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
+  window.addEventListener('DOMContentLoaded', () => {
+    // 1. Session-la irundhu user data-va edu
+    const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
+    
+    if (loggedUser) {
+      // 2. Role "Founder" illana Accounts & Expenses-ah maraichidu
+      if (loggedUser.role !== "Founder") {
+        // Sidebar-la irukkura Accounts & Expenses links-ah 'id' vechu kandupidi
+        const accLink = document.querySelector('a[href="employees.html"]');
+        
+        
+        if (accLink) accLink.style.display = 'none';
+        if (expLink) expLink.style.display = 'none';
+      }
+    } else {
+      // Login pannala-na veliya thallu
+      window.location.href = "login.html";
+    }
+  });
 </script>
 </body>
 </html>
