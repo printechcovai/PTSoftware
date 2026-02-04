@@ -302,10 +302,12 @@ h2 {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+ 
   const formatTime12 = () => {
     let now = new Date();
-    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
+    // seconds: '2-digit' add pannirukaen, appo dhaan calculation accurate-a varum
+    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+};
 
   // 1. Fetch Employees for Dropdown
   onSnapshot(collection(db, "EmployeesData"), (snap) => {
@@ -442,28 +444,27 @@ window.runLiveTimer = (id, startTimeStr) => {
     const timerElement = document.getElementById(`timer-${id}`);
     if (!timerElement) return;
 
-    // 1. Parse the time string (e.g., "01:53 PM")
-    const [time, modifier] = startTimeStr.split(' ');
-    let [hours, minutes] = time.split(':');
-    hours = parseInt(hours);
-    minutes = parseInt(minutes);
+    if (window[`interval_${id}`]) clearInterval(window[`interval_${id}`]);
 
-    // 2. Convert to 24-hour format for correct calculation
+    // 1. Parse "03:17:10 AM" format
+    const [time, modifier] = startTimeStr.split(' ');
+    const [hoursStr, minutesStr, secondsStr] = time.split(':');
+    
+    let hours = parseInt(hoursStr);
+    let minutes = parseInt(minutesStr);
+    let seconds = parseInt(secondsStr);
+
     if (modifier === 'PM' && hours < 12) hours += 12;
     if (modifier === 'AM' && hours === 12) hours = 0;
 
-    // 3. IMPORTANT: Set the start date with 0 SECONDS and 0 MILLISECONDS
+    // 2. Exact start time-ah set pannu
     const startTime = new Date();
-    startTime.setHours(hours, minutes, 0, 0); 
+    startTime.setHours(hours, minutes, seconds, 0); 
 
-    // Clear any previous interval for this specific ID to prevent speed-up
-    if (window[`int_${id}`]) clearInterval(window[`int_${id}`]);
-
-    window[`int_${id}`] = setInterval(() => {
+    window[`interval_${id}`] = setInterval(() => {
         const now = new Date();
-        let diff = now - startTime;
+        let diff = now.getTime() - startTime.getTime();
 
-        // If system time is slightly behind, don't show negative
         if (diff < 0) diff = 0;
 
         const h = Math.floor(diff / 3600000);
@@ -472,12 +473,10 @@ window.runLiveTimer = (id, startTimeStr) => {
 
         const timeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         
-        // Re-check if element still exists in DOM
-        const el = document.getElementById(`timer-${id}`);
-        if (el) {
-            el.innerText = timeStr;
+        if (document.getElementById(`timer-${id}`)) {
+            document.getElementById(`timer-${id}`).innerText = timeStr;
         } else {
-            clearInterval(window[`int_${id}`]);
+            clearInterval(window[`interval_${id}`]);
         }
     }, 1000);
 };
@@ -493,17 +492,25 @@ window.startLunch = async (id) => {
 };
 
 // End Lunch & Calculate Total Time
-window.endLunch = async (id, lunchOutTime) => {
-    const inTime = formatTime12();
-    const timerVal = document.getElementById(`timer-${id}`).innerText;
-    
-    const docRef = doc(db, "AttendanceRecords", id);
-    await updateDoc(docRef, {
-        lunchIn: inTime,
-        lunchDuration: timerVal,
-        lunchStatus: "COMPLETED"
-    });
-    alert(`Lunch Finished! Total time: ${timerVal}`);
+window.endLunch = async (id) => {
+    try {
+        const timerVal = document.getElementById(`timer-${id}`).innerText;
+        
+        // Timer-ah stop pannu
+        if (window[`interval_${id}`]) {
+            clearInterval(window[`interval_${id}`]);
+            window[`interval_${id}`] = null;
+        }
+
+        const docRef = doc(db, "AttendanceRecords", id);
+        await updateDoc(docRef, {
+            lunchIn: formatTime12(),
+            lunchDuration: timerVal,
+            lunchStatus: "COMPLETED"
+        });
+        
+        alert(`Lunch Finished! Time: ${timerVal}`);
+    } catch (e) { alert("Error: " + e.message); }
 };
 </script>
 
