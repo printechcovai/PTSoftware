@@ -238,7 +238,7 @@ width: auto;
     };
 
     // 1. MASTER LOGIN
-    if (u === "admin" && p === "1234") {
+    if (u === "Printech" && p === "PT") {
       let master = { name: "Admin", user: "admin", role: "Founder" };
       await saveLoginLog(master); 
       sessionStorage.setItem("loggedUser", JSON.stringify(master));
