@@ -279,7 +279,7 @@ h2 {
 
     <div class="btnRow">
         <button id="inBtn">IN</button>
-        <button id="outBtn">OUT</button>
+        
     </div>
 
     <div id="attendanceList"></div>
@@ -355,41 +355,58 @@ h2 {
 
   // 4. DISPLAY LIST (With Dynamic Button)
   const attList = document.getElementById("attendanceList");
-  onSnapshot(query(collection(db, "AttendanceRecords"), orderBy("timestamp", "desc")), (snap) => {
-      attList.innerHTML = "";
-      snap.forEach(docSnap => {
-          const d = docSnap.data();
-          const id = docSnap.id;
-          
-          let card = document.createElement("div");
-          card.className = "attCard";
-          
-          // Machi, status "IN"-nu irundha mattum OUT button kaatuvom
-          const outBtnHtml = d.status === "IN" 
-              ? `<button onclick="markOut('${id}')" style="background:#07AFC0; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; margin-right:10px;">Mark OUT</button>` 
-              : "";
+  // Card Display Section
+onSnapshot(query(collection(db, "AttendanceRecords"), orderBy("timestamp", "desc")), (snap) => {
+    attList.innerHTML = "";
+    snap.forEach(docSnap => {
+        const d = docSnap.data();
+        const id = docSnap.id;
+        
+        // Timer Background Sync
+        let durationDisplay = d.lunchDuration || '00:00:00';
 
-          card.innerHTML = `
-              <div class="twoCol">
-                  <div class="left">
-                      <p><b>Name:</b> ${d.employeeName}</p>
-                      <p><b>Date:</b> ${d.date}</p>
-                  </div>
-                  <div class="right">
-                      <p><b>IN Time:</b> ${d.inTime}</p>
-                      <p><b>OUT Time:</b> ${d.outTime}</p>
-                  </div>
-              </div>
-              <p><b>Status:</b> <span style="color:${d.status === 'IN' ? 'green' : 'red'}">${d.status}</span></p>
-              <div style="margin-top:10px;">
-                  ${outBtnHtml}
-                  <button class="delBtn" onclick="deleteAtt('${id}')">Delete</button>
-              </div>
-          `;
-          attList.appendChild(card);
-      });
-  });
+        let card = document.createElement("div");
+        card.className = "attCard";
+        card.style.padding = "10px 15px"; // Thinner padding
 
+        card.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div style="flex: 1;">
+            <p style="margin: 2px 0;"><b>${d.employeeName}</b> | <small>${d.date}</small></p>
+            <p style="margin: 2px 0; font-size: 13px;">IN: ${d.inTime} | OUT: ${d.outTime}</p>
+            <div style="margin-top: 8px;">
+                ${d.status === 'IN' ? `<button onclick="markOut('${id}')" style="background: linear-gradient(to right, #07AFC0, #1aa853); color:white; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;">MARK OUT</button>` : ""}
+                <button class="delBtn" onclick="deleteAtt('${id}')" style="padding: 5px 12px; font-size:12px;">Delete</button>
+            </div>
+        </div>
+
+        <div style="width: 220px; background: #f4f9fb; padding: 8px; border-radius: 8px; border-left: 4px solid #07AFC0; font-size: 12px;">
+            <p style="margin: 0; display:flex; justify-content:space-between;">
+                <b style="color: #07AFC0;">Lunch:</b> 
+                <span id="timer-${id}" style="color:#333; font-weight:bold;">${durationDisplay}</span>
+            </p>
+            <p style="margin: 4px 0 0 0; color: #666;">
+                Out: ${d.lunchOut || '-'} | In: ${d.lunchIn || '-'}
+            </p>
+            <div style="margin-top: 5px;">
+                ${!d.lunchOut ? `
+                    <button id="lOutBtn-${id}" onclick="startLunch('${id}')" style="background: linear-gradient(to right, #07AFC0, #26bfa3); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">Lunch OUT</button>
+                ` : ""}
+                ${d.lunchOut && !d.lunchIn ? `
+                    <button id="lInBtn-${id}" onclick="endLunch('${id}', '${d.lunchOut}')" style="background: linear-gradient(to right, #1aa853, #07AFC0); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">Lunch IN</button>
+                ` : ""}
+            </div>
+        </div>
+    </div>
+`;
+        attList.appendChild(card);
+
+        // Auto-start timer if lunch is ongoing
+        if (d.lunchOut && !d.lunchIn) {
+            runLiveTimer(id, d.lunchOut);
+        }
+    });
+});
   window.deleteAtt = async (id) => {
       if(confirm("Delete pannelama?")) await deleteDoc(doc(db, "AttendanceRecords", id));
   };
@@ -415,6 +432,53 @@ h2 {
       window.location.href = "login.html";
     }
   });
+
+
+  // Live Timer Function
+window.runLiveTimer = (id, startTimeStr) => {
+    const timerElement = document.getElementById(`timer-${id}`);
+    const start = new Date();
+    const [time, modifier] = startTimeStr.split(' ');
+    let [hours, minutes] = time.split(':');
+    if (modifier === 'PM' && hours < 12) hours = parseInt(hours) + 12;
+    if (modifier === 'AM' && hours == 12) hours = 0;
+    
+    const startTime = new Date();
+    startTime.setHours(hours, minutes, 0);
+
+    setInterval(() => {
+        const now = new Date();
+        const diff = Math.abs(now - startTime);
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        if(timerElement) timerElement.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }, 1000);
+};
+
+// Start Lunch
+window.startLunch = async (id) => {
+    const docRef = doc(db, "AttendanceRecords", id);
+    await updateDoc(docRef, {
+        lunchOut: formatTime12(),
+        lunchStatus: "LUNCH_OUT"
+    });
+    alert("Lunch Started! Timer On.");
+};
+
+// End Lunch & Calculate Total Time
+window.endLunch = async (id, lunchOutTime) => {
+    const inTime = formatTime12();
+    const timerVal = document.getElementById(`timer-${id}`).innerText;
+    
+    const docRef = doc(db, "AttendanceRecords", id);
+    await updateDoc(docRef, {
+        lunchIn: inTime,
+        lunchDuration: timerVal,
+        lunchStatus: "COMPLETED"
+    });
+    alert(`Lunch Finished! Total time: ${timerVal}`);
+};
 </script>
 
 </body>
