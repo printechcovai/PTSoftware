@@ -302,216 +302,110 @@ h2 {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
- 
+  // Time format with seconds for calculation
   const formatTime12 = () => {
-    let now = new Date();
-    // seconds: '2-digit' add pannirukaen, appo dhaan calculation accurate-a varum
-    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-};
+    return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+  };
 
-  // 1. Fetch Employees for Dropdown
+  // 1. Fetch Employees
   onSnapshot(collection(db, "EmployeesData"), (snap) => {
-      const empSelect = document.getElementById("empSelect");
-      empSelect.innerHTML = '<option value="">Select Employee</option>';
-      snap.forEach(docSnap => {
-          const emp = docSnap.data();
-          if (emp.name) {
-              let opt = document.createElement("option");
-              opt.value = emp.name;
-              opt.textContent = emp.name;
-              empSelect.appendChild(opt);
-          }
-      });
+    const empSelect = document.getElementById("empSelect");
+    empSelect.innerHTML = '<option value="">Select Employee</option>';
+    snap.forEach(docSnap => {
+      const emp = docSnap.data();
+      let opt = document.createElement("option");
+      opt.value = emp.name;
+      opt.textContent = emp.name;
+      empSelect.appendChild(opt);
+    });
   });
 
-  // 2. MARK IN (New Record)
+  // 2. MARK IN
   document.getElementById("inBtn").onclick = async () => {
-      const name = document.getElementById("empSelect").value;
-      const date = document.getElementById("attDate").value;
-      if (!name || !date) return alert("Details fill pannu machi!");
-
-      try {
-          await addDoc(collection(db, "AttendanceRecords"), {
-              employeeName: name,
-              date: date,
-              inTime: formatTime12(),
-              outTime: "-",
-              status: "IN",
-              timestamp: serverTimestamp()
-          });
-          alert(`${name} marked IN! ✅`);
-      } catch (e) { alert("Error: " + e.message); }
+    const name = document.getElementById("empSelect").value;
+    const date = document.getElementById("attDate").value;
+    if (!name || !date) return alert("Details fill pannu machi!");
+    await addDoc(collection(db, "AttendanceRecords"), {
+      employeeName: name, date, inTime: formatTime12(), outTime: "-", status: "IN", timestamp: serverTimestamp()
+    });
+    alert("Marked IN! ✅");
   };
 
-  // 3. MARK OUT (Card-kulla irukura button click panna)
+  // 3. MARK OUT
   window.markOut = async (id) => {
-      try {
-          const docRef = doc(db, "AttendanceRecords", id);
-          await updateDoc(docRef, {
-              outTime: formatTime12(),
-              status: "OUT"
-          });
-          alert("Marked OUT! 🚀");
-      } catch (e) { alert("Error: " + e.message); }
+    await updateDoc(doc(db, "AttendanceRecords", id), { outTime: formatTime12(), status: "OUT" });
   };
 
-  // 4. DISPLAY LIST (With Dynamic Button)
-  // 4. DISPLAY LIST (With Dynamic Button)
-const attList = document.getElementById("attendanceList");
-
-onSnapshot(query(collection(db, "AttendanceRecords"), orderBy("timestamp", "desc")), (snap) => {
+  // 4. DISPLAY LIST (Clean logic without timer)
+  onSnapshot(query(collection(db, "AttendanceRecords"), orderBy("timestamp", "desc")), (snap) => {
+    const attList = document.getElementById("attendanceList");
     attList.innerHTML = "";
     snap.forEach(docSnap => {
-        const d = docSnap.data();
-        const id = docSnap.id;
-        
-        // 🔥 DATE FORMAT FIX: YYYY-MM-DD -> DD/MM/YYYY
-        // Input-la irundhu vara date-ah split panni reverse panni join pandrom
-        const formattedDisplayDate = d.date ? d.date.split("-").reverse().join("/") : "-";
+      const d = docSnap.data();
+      const id = docSnap.id;
+      const formattedDate = d.date ? d.date.split("-").reverse().join("/") : "-";
 
-        let durationDisplay = d.lunchDuration || '00:00:00';
-
-        let card = document.createElement("div");
-        card.className = "attCard";
-        card.style.padding = "10px 15px"; 
-
-        card.innerHTML = `
-    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-        <div style="flex: 1;">
-            <p style="margin: 2px 0;"><b>${d.employeeName}</b> | <small>${formattedDisplayDate}</small></p>
-            <p style="margin: 2px 0; font-size: 13px;">IN: ${d.inTime} | OUT: ${d.outTime}</p>
-            <div style="margin-top: 8px;">
-                ${d.status === 'IN' ? `<button onclick="markOut('${id}')" style="background: linear-gradient(to right, #07AFC0, #1aa853); color:white; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;">MARK OUT</button>` : ""}
-                <button class="delBtn" onclick="deleteAtt('${id}')" style="padding: 5px 12px; font-size:12px;">Delete</button>
+      let card = document.createElement("div");
+      card.className = "attCard";
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="flex: 1;">
+                <p><b>${d.employeeName}</b> | <small>${formattedDate}</small></p>
+                <p style="font-size: 13px;">IN: ${d.inTime} | OUT: ${d.outTime}</p>
+                <div style="margin-top: 8px;">
+                    ${d.status === 'IN' ? `<button onclick="markOut('${id}')" style="background: linear-gradient(to right, #07AFC0, #1aa853); color:white; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;">MARK OUT</button>` : ""}
+                    <button class="delBtn" onclick="deleteAtt('${id}')" style="padding: 5px 12px; font-size:12px;">Delete</button>
+                </div>
             </div>
-        </div>
-
-        <div style="width: 220px; background: #f4f9fb; padding: 8px; border-radius: 8px; border-left: 4px solid #07AFC0; font-size: 12px;">
-            <p style="margin: 0; display:flex; justify-content:space-between;">
-                <b style="color: #07AFC0;">Lunch:</b> 
-                <span id="timer-${id}" style="color:#333; font-weight:bold;">${durationDisplay}</span>
-            </p>
-            <p style="margin: 4px 0 0 0; color: #666;">
-                Out: ${d.lunchOut || '-'} | In: ${d.lunchIn || '-'}
-            </p>
-            <div style="margin-top: 5px;">
-                ${!d.lunchOut ? `
-                    <button id="lOutBtn-${id}" onclick="startLunch('${id}')" style="background: linear-gradient(to right, #07AFC0, #26bfa3); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">Lunch OUT</button>
-                ` : ""}
-                ${d.lunchOut && !d.lunchIn ? `
-                    <button id="lInBtn-${id}" onclick="endLunch('${id}', '${d.lunchOut}')" style="background: linear-gradient(to right, #1aa853, #07AFC0); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">Lunch IN</button>
-                ` : ""}
+            <div style="width: 220px; background: #f4f9fb; padding: 10px; border-radius: 8px; border-left: 4px solid #07AFC0; font-size: 12px;">
+                <p style="margin: 0 0 5px 0;"><b>Out:</b> ${d.lunchOut || '-'}</p>
+                <p style="margin: 0 0 5px 0;"><b>In:</b> ${d.lunchIn || '-'}</p>
+                <p style="margin: 5px 0; color: #1aa853;"><b>Duration:</b> ${d.lunchDuration || '-'}</p>
+                <div style="margin-top: 5px;">
+                    ${!d.lunchOut ? `<button onclick="startLunch('${id}')" style="background: linear-gradient(to right, #07AFC0, #26bfa3); color:white; border:none; padding:5px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">Lunch OUT</button>` : ""}
+                    ${d.lunchOut && !d.lunchIn ? `<button onclick="endLunch('${id}', '${d.lunchOut}')" style="background: linear-gradient(to right, #1aa853, #07AFC0); color:white; border:none; padding:5px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">Lunch IN</button>` : ""}
+                </div>
             </div>
-        </div>
-    </div>
-`;
-        attList.appendChild(card);
-
-        if (d.lunchOut && !d.lunchIn) {
-            runLiveTimer(id, d.lunchOut);
-        }
+        </div>`;
+      attList.appendChild(card);
     });
-});
-  window.deleteAtt = async (id) => {
-      if(confirm("Delete pannelama?")) await deleteDoc(doc(db, "AttendanceRecords", id));
-  };
-
-  window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
-
-  window.addEventListener('DOMContentLoaded', () => {
-    // 1. Session-la irundhu user data-va edu
-    const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
-    
-    if (loggedUser) {
-      // 2. Role "Founder" illana Accounts & Expenses-ah maraichidu
-      if (loggedUser.role !== "Founder") {
-        // Sidebar-la irukkura Accounts & Expenses links-ah 'id' vechu kandupidi
-        const accLink = document.querySelector('a[href="employees.html"]');
-        
-        
-        if (accLink) accLink.style.display = 'none';
-        if (expLink) expLink.style.display = 'none';
-      }
-    } else {
-      // Login pannala-na veliya thallu
-      window.location.href = "login.html";
-    }
   });
 
+  // LUNCH START
+  window.startLunch = async (id) => {
+    await updateDoc(doc(db, "AttendanceRecords", id), { lunchOut: formatTime12() });
+  };
 
-  // Live Timer Function
-window.runLiveTimer = (id, startTimeStr) => {
-    const timerElement = document.getElementById(`timer-${id}`);
-    if (!timerElement) return;
-
-    if (window[`interval_${id}`]) clearInterval(window[`interval_${id}`]);
-
-    // 1. Parse "03:17:10 AM" format
-    const [time, modifier] = startTimeStr.split(' ');
-    const [hoursStr, minutesStr, secondsStr] = time.split(':');
-    
-    let hours = parseInt(hoursStr);
-    let minutes = parseInt(minutesStr);
-    let seconds = parseInt(secondsStr);
-
-    if (modifier === 'PM' && hours < 12) hours += 12;
-    if (modifier === 'AM' && hours === 12) hours = 0;
-
-    // 2. Exact start time-ah set pannu
-    const startTime = new Date();
-    startTime.setHours(hours, minutes, seconds, 0); 
-
-    window[`interval_${id}`] = setInterval(() => {
-        const now = new Date();
-        let diff = now.getTime() - startTime.getTime();
-
-        if (diff < 0) diff = 0;
-
-        const h = Math.floor(diff / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        const s = Math.floor((diff % 60000) / 1000);
-
-        const timeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        
-        if (document.getElementById(`timer-${id}`)) {
-            document.getElementById(`timer-${id}`).innerText = timeStr;
-        } else {
-            clearInterval(window[`interval_${id}`]);
-        }
-    }, 1000);
-};
-
-// Start Lunch
-window.startLunch = async (id) => {
-    const docRef = doc(db, "AttendanceRecords", id);
-    await updateDoc(docRef, {
-        lunchOut: formatTime12(),
-        lunchStatus: "LUNCH_OUT"
-    });
-    alert("Lunch Started! Timer On.");
-};
-
-// End Lunch & Calculate Total Time
-window.endLunch = async (id) => {
+  // LUNCH END & CALCULATION (No Live Timer)
+  window.endLunch = async (id, lOut) => {
     try {
-        const timerVal = document.getElementById(`timer-${id}`).innerText;
-        
-        // Timer-ah stop pannu
-        if (window[`interval_${id}`]) {
-            clearInterval(window[`interval_${id}`]);
-            window[`interval_${id}`] = null;
-        }
+      const lIn = formatTime12();
+      
+      const parse = (ts) => {
+        const [t, m] = ts.split(' ');
+        const parts = t.split(':');
+        let hrs = parseInt(parts[0]);
+        if (m === 'PM' && hrs < 12) hrs += 12;
+        if (m === 'AM' && hrs === 12) hrs = 0;
+        const d = new Date(); 
+        d.setHours(hrs, parseInt(parts[1]), parseInt(parts[2]), 0);
+        return d;
+      };
 
-        const docRef = doc(db, "AttendanceRecords", id);
-        await updateDoc(docRef, {
-            lunchIn: formatTime12(),
-            lunchDuration: timerVal,
-            lunchStatus: "COMPLETED"
-        });
-        
-        alert(`Lunch Finished! Time: ${timerVal}`);
+      const diff = new Date() - parse(lOut);
+      const hh = Math.floor(diff / 3600000).toString().padStart(2, '0');
+      const mm = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+      const ss = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+      
+      await updateDoc(doc(db, "AttendanceRecords", id), { 
+        lunchIn: lIn, 
+        lunchDuration: `${hh}:${mm}:${ss}` 
+      });
     } catch (e) { alert("Error: " + e.message); }
-};
+  };
+
+  window.deleteAtt = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "AttendanceRecords", id)); };
+  window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
 </script>
 
 </body>
