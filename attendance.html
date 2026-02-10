@@ -406,6 +406,24 @@ h2 {
 
   window.deleteAtt = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "AttendanceRecords", id)); };
   window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
+// Check User Role and Hide Employees Link
+document.addEventListener("DOMContentLoaded", () => {
+    const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
+
+    if (loggedUser) {
+        // "Founder" illa-na Employee link-ah hide pannu
+        if (loggedUser.role !== "Founder") {
+            const employeeLink = document.querySelector("a[href='employees.html']");
+            if (employeeLink) {
+                employeeLink.style.display = "none";
+            }
+        }
+    } else {
+        // User login panla-na direct-ah login page-ku anuppidu
+        window.location.href = "login.html";
+    }
+});
+  
 </script>
 
 </body>
