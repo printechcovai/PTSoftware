@@ -495,7 +495,7 @@ select,input{
     const name = document.getElementById("itemName").value;
     const avl = document.getElementById("available").value;
     const req = document.getElementById("required").value;
-    if (!name || !avl || !req) return alert("Machi, details fill pannu!");
+    if (!name || !avl || !req) return alert("Fill the Details!");
     try {
       const now = new Date();
       const timeStr = now.toLocaleDateString('en-GB') + " " + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -516,7 +516,7 @@ select,input{
   window.exportStock = async () => {
     try {
         const snap = await getDocs(query(stockCol, orderBy("timestamp", "desc")));
-        if (snap.empty) return alert("Export panna stock illa!");
+        if (snap.empty) return alert("Details Empty!");
         let csvContent = "Item Name,Available,Required,Status,Added By,Followed By,Date Time\n";
         snap.forEach(docSnap => {
             const s = docSnap.data();
@@ -536,7 +536,7 @@ select,input{
 
   window.followStock = async (id) => { await updateDoc(doc(db, "StockData", id), { followedBy: getUsername() }); };
   window.markAsDone = async (id) => { await updateDoc(doc(db, "StockData", id), { done: true, status: "OK" }); };
-  window.deleteStock = async (id) => { if (confirm("Kandippa delete pannelama?")) await deleteDoc(doc(db, "StockData", id)); };
+  window.deleteStock = async (id) => { if (confirm("Are you sure Do you want delete this data?")) await deleteDoc(doc(db, "StockData", id)); };
   window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
 
   // --- Real-time List (Unga original grid layout) ---

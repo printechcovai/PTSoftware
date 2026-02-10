@@ -341,7 +341,7 @@ table td {
   window.exportAccounts = async () => {
     try {
         const snap = await getDocs(query(accCol, orderBy("timestamp", "desc")));
-        if (snap.empty) return alert("Machi, Accounts data empty-ah irukku!");
+        if (snap.empty) return alert(" Accounts data's is empty!");
 
         let csvContent = "Agent Name,Job Detail,Amount,Mobile,Added By,Followed By,Done By,Status\n";
         
@@ -370,7 +370,7 @@ table td {
     const amt = document.getElementById("amount").value.trim();
     const mob = document.getElementById("mobile").value.trim();
 
-    if (!a || !j || !amt || !mob) return alert("Fill all details machi!");
+    if (!a || !j || !amt || !mob) return alert("Fill all details!");
 
     try {
       const docId = currentEditId ? currentEditId : (a + "_" + Date.now());
@@ -391,7 +391,7 @@ table td {
 
   // 🔥 OTHERS
   window.updateAccountStatus = async (id, data) => { await updateDoc(doc(db, "AccountsData", id), data); };
-  window.deleteAcc = async (id) => { if (confirm("Delete pannelama?")) await deleteDoc(doc(db, "AccountsData", id)); };
+  window.deleteAcc = async (id) => { if (confirm("Are you sure Do you want delete?")) await deleteDoc(doc(db, "AccountsData", id)); };
   window.editAcc = async (id) => {
     const docSnap = await getDoc(doc(db, "AccountsData", id));
     if (docSnap.exists()) {
@@ -455,8 +455,7 @@ table td {
       if (loggedUser.role !== "Founder") {
         // Sidebar-la irukkura Accounts & Expenses links-ah 'id' vechu kandupidi
         const accLink = document.querySelector('a[href="employees.html"]');
-        
-        
+      
         if (accLink) accLink.style.display = 'none';
         if (expLink) expLink.style.display = 'none';
       }

@@ -346,7 +346,7 @@ justify-content: space-between;
   window.exportExpenses = async () => {
     try {
         const snap = await getDocs(query(expCol, orderBy("timestamp", "desc")));
-        if (snap.empty) return alert("Expenses edhuvum illa machi!");
+        if (snap.empty) return alert("Expenses doesn't there!");
 
         let csvContent = "Date,Shop Name,Item Name,Amount,Added By,Approved By,Paid By,Status\n";
         
@@ -374,7 +374,7 @@ justify-content: space-between;
     const a = document.getElementById("amount").value.trim();
     const d = document.getElementById("date").value;
 
-    if (!s || !i || !a || !d) return alert("Machi, ellathaiyum fill pannu!");
+    if (!s || !i || !a || !d) return alert(" Fill the Details!");
 
     let dt = new Date(d);
     let finalDate = dt.getDate().toString().padStart(2,'0') + "/" +
@@ -401,7 +401,7 @@ justify-content: space-between;
   };
 
   window.updateStatus = async (id, data) => { await updateDoc(doc(db, "ExpensesData", id), data); };
-  window.deleteExp = async (id) => { if (confirm("Delete pannelama?")) await deleteDoc(doc(db, "ExpensesData", id)); };
+  window.deleteExp = async (id) => { if (confirm("Are you sure Do you want delete?")) await deleteDoc(doc(db, "ExpensesData", id)); };
   window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
 
   window.fillExpense = async (id) => {

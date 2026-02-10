@@ -324,7 +324,7 @@ h2 {
   document.getElementById("inBtn").onclick = async () => {
     const name = document.getElementById("empSelect").value;
     const date = document.getElementById("attDate").value;
-    if (!name || !date) return alert("Details fill pannu machi!");
+    if (!name || !date) return alert("Fill the details!");
     await addDoc(collection(db, "AttendanceRecords"), {
       employeeName: name, date, inTime: formatTime12(), outTime: "-", status: "IN", timestamp: serverTimestamp()
     });

@@ -357,8 +357,8 @@ justify-content: space-between;
     const pass = document.getElementById("empPass").value;
     const cpass = document.getElementById("empCPass").value;
 
-    if (!name || !user || !pass) return alert("Machi, details fill pannu!");
-    if (pass !== cpass) return alert("Password match aagala da!");
+    if (!name || !user || !pass) return alert("Fill the Details!");
+    if (pass !== cpass) return alert("Password doesn't match!");
 
     try {
       // setDoc use panni 'Name'-ah ID-ah fix panrom
@@ -416,7 +416,7 @@ justify-content: space-between;
   };
 
   window.deleteEmp = async (id) => {
-    if (confirm(`Kandippa ${id}-ah delete pannelama machi?`)) {
+    if (confirm(`Are You sure  ${id} do you want delete this id?`)) {
       await deleteDoc(doc(db, "EmployeesData", id));
     }
   };

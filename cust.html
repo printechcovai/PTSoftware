@@ -387,7 +387,7 @@ justify-content: space-between;
     try {
         console.log("Exporting..."); // Debugging-ku
         const snap = await getDocs(query(ordersCol, orderBy("timestamp", "desc")));
-        if (snap.empty) return alert("Export panna orders edhuvum illa!");
+        if (snap.empty) return alert("Details doesn't here to export data!");
 
         let csvContent = "Order No,Customer Name,Mobile,Confirmed Date,Deadline,Printing Type,Added By,Followed By,Status\n";
         
@@ -416,7 +416,7 @@ justify-content: space-between;
 
   // --- Other Window Functions ---
   window.updateStatus = async (id, data) => { await updateDoc(doc(db, "SoftwareData", id), data); };
-  window.deleteOrder = async (id) => { if (confirm("Delete pannelama?")) await deleteDoc(doc(db, "SoftwareData", id)); };
+  window.deleteOrder = async (id) => { if (confirm("Are you sure do you want delete?")) await deleteDoc(doc(db, "SoftwareData", id)); };
   window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
 
   // --- Place Order Button Logic ---
@@ -424,7 +424,7 @@ justify-content: space-between;
     const orderNo = document.getElementById("orderNo").value.trim();
     const custName = document.getElementById("customerName").value.trim();
 
-    if(!orderNo || !custName) return alert("Machi, Name and Order No rendume mukkiyam!");
+    if(!orderNo || !custName) return alert("Name and Order No is important!");
 
     let selectedTypes = [];
     document.querySelectorAll(".printType:checked").forEach(t => selectedTypes.push(t.value));
