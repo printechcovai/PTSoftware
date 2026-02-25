@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -238,7 +237,7 @@ width: auto;
       } catch (err) { console.error("History store error:", err); }
     };
 
-  
+    // 1. MASTER LOGIN
     if (u === "Printech" && p === "PT") {
       let master = { name: "Admin", user: "admin", role: "Founder" };
       await saveLoginLog(master); 
@@ -247,7 +246,7 @@ width: auto;
       return;
     }
 
-   
+    // 2. EMPLOYEE LOGIN
     try {
       const q = query(collection(db, "EmployeesData"), where("user", "==", u), where("pass", "==", p));
       const querySnapshot = await getDocs(q);
