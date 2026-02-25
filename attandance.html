@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Attendance</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: tahoma, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+
+    /* 🔥 DOT BACKGROUND */
+    background: url("bgdot.jpeg") repeat;
+}
+.container {
+    width: 900px;
+    background: #ffffff;
+    padding: 40px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.08);
+    border-radius: 12px;
+
+    height: calc(100vh - 80px); /* 🔥 FIXED */
+    overflow-y: auto;
+}
+
+.main-wrapper {
+    margin-left: 230px;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 40px;
+}
+h2 {
+    display: inline-block;
+    background: linear-gradient(to right,  #07AFC0, #1aa853);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 28px;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 35px;
+}
+
+.inputGroup {
+    width: 32%;
+    display: flex;
+    flex-direction: column;
+}
+
+.inputGroup label {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.selectBox, input {
+    border: none;
+    background: transparent;
+    border-bottom: 3px solid #9de79d;
+    padding: 10px 5px;
+    font-size: 16px;
+    outline: none;
+}
+
+.btnRow {
+    display: flex;
+    gap: 15px;
+    margin-top: -15px;
+}
+
+.btnRow button {
+    padding: 10px 25px;
+    background: linear-gradient(to right, #07AFC0, #1aa853);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.btnRow button:hover { background: linear-gradient(to right, #1aa853, #07AFC0); }
+
+
+.attCard {
+    background: #f7f7f7;
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 20px;
+    border-left: 6px solid #34c759;
+}
+
+.twoCol {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.left, .right {
+    width: 48%;
+}
+
+.delBtn {
+    padding: 7px 15px;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    background: #ff4d4d;
+    cursor: pointer;
+}
+
+.sidebar {
+    width: 230px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: linear-gradient(#34caca, #1aa853);
+    padding-top: 30px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+}
+
+.sidebar a {
+    display: block;
+    padding: 12px 20px;
+    margin: 10px 15px;
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 20px;
+    transition: 0.3s;
+}
+
+
+.sidebar a:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.sidebar button {
+    display: block;
+    padding: 12px 20px;
+    margin: 10px 15px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: 0.3s;
+    background: white;
+    color: #26bfa3;
+    border-radius: 30px;
+    border: none;
+    font-weight: bold;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+.wave-container {
+    position: fixed;
+    top: 0;
+    left: 230px;
+    width: calc(100% - 230px);
+    height: 100vh;
+    overflow: hidden;   /* 🔥 THIS IS KEY */
+    z-index: -1;
+}
+/* 🔥 TRACK THAT MOVES */
+.wave-track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    display: flex;
+    width: 200%;              /* 🔥 FORCE DOUBLE WIDTH */
+    transform: translateY(-50%);
+    animation: waveMove 40s linear infinite;
+}
+
+
+/* 🔥 EACH WAVE IMAGE */
+.wave {
+    width: 50%;               /* 🔥 HALF of track */
+    height: auto;
+    flex-shrink: 0;
+}
+
+
+.wave1 {
+  animation: moveWave 30s ease-in-out infinite;
+}
+@keyframes waveMove {
+  0% {
+    transform: translate(0, -50%);
+  }
+  100% {
+    transform: translate(-50%, -50%);
+  }
+}
+
+
+
+.ptimg{
+    margin-left: 30px;
+    width: 70%;
+    
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    
+}
+.sidebar img {
+        width: 150px;
+        height: auto;
+        padding: 12px 20px;
+        margin-left: 5px;
+        align-items: center;
+        
+}
+@media (max-width: 1366px) {
+  .wave {
+    width: 100%;
+  }
+}
+</style></head>
+<body>
+    <div class="wave-container">
+    <div class="wave-track">
+      <img src="Software.png" class="wave">
+      <img src="Software.png" class="wave">
+    </div>
+  </div>
+
+
+<!-- <div id="flash"></div> -->
+    <div class="sidebar">
+            <div class="ptimg"><img src="PTlogo.png" alt=""></div>
+            <br> 
+
+    <a href="home.html">Home</a>
+    <a href="employees.html">Employees</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="stock.html">Stock</a>
+    <a href="cust.html">Customers</a>
+    <a href="accounts.html">Accounts</a>
+    <a href="expenses.html">Expenses</a>
+
+    <br><br><br><br>
+
+    <button onclick="logout()">Logout</button>
+</div>
+    
+<!-- CONTENT -->
+ <div class="main-wrapper">
+<div class="container" id="att">
+
+    <h2>Attendance</h2>
+
+    <div class="row">
+        <div class="inputGroup">
+            <label>Employee Name</label>
+            <select id="empSelect" class="selectBox">
+                <option value="">Select Employee</option>
+            </select>
+        </div>
+
+        <div class="inputGroup">
+            <label>Date</label>
+            <input type="date" id="attDate">
+        </div>
+
+        <div class="inputGroup"></div>
+    </div>
+
+    <div class="btnRow">
+        <button id="inBtn">IN</button>
+        
+    </div>
+
+    <div id="attendanceList"></div>
+
+</div>
+</div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, deleteDoc, doc, orderBy, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
+    authDomain: "printech-c101a.firebaseapp.com",
+    projectId: "printech-c101a",
+    storageBucket: "printech-c101a.firebasestorage.app",
+    messagingSenderId: "629188473697",
+    appId: "1:629188473697:web:1ca8e7a5294eb9ec830b20"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Time format with seconds for calculation
+  const formatTime12 = () => {
+    return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+  };
+
+  // 1. Fetch Employees
+  onSnapshot(collection(db, "EmployeesData"), (snap) => {
+    const empSelect = document.getElementById("empSelect");
+    empSelect.innerHTML = '<option value="">Select Employee</option>';
+    snap.forEach(docSnap => {
+      const emp = docSnap.data();
+      let opt = document.createElement("option");
+      opt.value = emp.name;
+      opt.textContent = emp.name;
+      empSelect.appendChild(opt);
+    });
+  });
+
+  // 2. MARK IN
+  document.getElementById("inBtn").onclick = async () => {
+    const name = document.getElementById("empSelect").value;
+    const date = document.getElementById("attDate").value;
+    if (!name || !date) return alert("Fill the details!");
+    await addDoc(collection(db, "AttendanceRecords"), {
+      employeeName: name, date, inTime: formatTime12(), outTime: "-", status: "IN", timestamp: serverTimestamp()
+    });
+    alert("Marked IN! ✅");
+  };
+
+  // 3. MARK OUT
+  window.markOut = async (id) => {
+    await updateDoc(doc(db, "AttendanceRecords", id), { outTime: formatTime12(), status: "OUT" });
+  };
+
+  // 4. DISPLAY LIST (Clean logic without timer)
+  onSnapshot(query(collection(db, "AttendanceRecords"), orderBy("timestamp", "desc")), (snap) => {
+    const attList = document.getElementById("attendanceList");
+    attList.innerHTML = "";
+    snap.forEach(docSnap => {
+      const d = docSnap.data();
+      const id = docSnap.id;
+      const formattedDate = d.date ? d.date.split("-").reverse().join("/") : "-";
+
+      let card = document.createElement("div");
+      card.className = "attCard";
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="flex: 1;">
+                <p><b>${d.employeeName}</b> | <small>${formattedDate}</small></p>
+                <p style="font-size: 13px;">IN: ${d.inTime} | OUT: ${d.outTime}</p>
+                <div style="margin-top: 8px;">
+                    ${d.status === 'IN' ? `<button onclick="markOut('${id}')" style="background: linear-gradient(to right, #07AFC0, #1aa853); color:white; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;">MARK OUT</button>` : ""}
+                    <button class="delBtn" onclick="deleteAtt('${id}')" style="padding: 5px 12px; font-size:12px;">Delete</button>
+                </div>
+            </div>
+            <div style="width: 220px; background: #f4f9fb; padding: 10px; border-radius: 8px; border-left: 4px solid #07AFC0; font-size: 12px;">
+                <p style="margin: 0 0 5px 0;"><b>Out:</b> ${d.lunchOut || '-'}</p>
+                <p style="margin: 0 0 5px 0;"><b>In:</b> ${d.lunchIn || '-'}</p>
+                <p style="margin: 5px 0; color: #1aa853;"><b>Duration:</b> ${d.lunchDuration || '-'}</p>
+                <div style="margin-top: 5px;">
+                    ${!d.lunchOut ? `<button onclick="startLunch('${id}')" style="background: linear-gradient(to right, #07AFC0, #26bfa3); color:white; border:none; padding:5px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">Lunch OUT</button>` : ""}
+                    ${d.lunchOut && !d.lunchIn ? `<button onclick="endLunch('${id}', '${d.lunchOut}')" style="background: linear-gradient(to right, #1aa853, #07AFC0); color:white; border:none; padding:5px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">Lunch IN</button>` : ""}
+                </div>
+            </div>
+        </div>`;
+      attList.appendChild(card);
+    });
+  });
+
+  // LUNCH START
+  window.startLunch = async (id) => {
+    await updateDoc(doc(db, "AttendanceRecords", id), { lunchOut: formatTime12() });
+  };
+
+  // LUNCH END & CALCULATION (No Live Timer)
+  window.endLunch = async (id, lOut) => {
+    try {
+      const lIn = formatTime12();
+      
+      const parse = (ts) => {
+        const [t, m] = ts.split(' ');
+        const parts = t.split(':');
+        let hrs = parseInt(parts[0]);
+        if (m === 'PM' && hrs < 12) hrs += 12;
+        if (m === 'AM' && hrs === 12) hrs = 0;
+        const d = new Date(); 
+        d.setHours(hrs, parseInt(parts[1]), parseInt(parts[2]), 0);
+        return d;
+      };
+
+      const diff = new Date() - parse(lOut);
+      const hh = Math.floor(diff / 3600000).toString().padStart(2, '0');
+      const mm = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+      const ss = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+      
+      await updateDoc(doc(db, "AttendanceRecords", id), { 
+        lunchIn: lIn, 
+        lunchDuration: `${hh}:${mm}:${ss}` 
+      });
+    } catch (e) { alert("Error: " + e.message); }
+  };
+
+  window.deleteAtt = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "AttendanceRecords", id)); };
+  window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
+// Check User Role and Hide Employees Link
+document.addEventListener("DOMContentLoaded", () => {
+    const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
+
+    if (loggedUser) {
+        // "Founder" illa-na Employee link-ah hide pannu
+        if (loggedUser.role !== "Founder") {
+            const employeeLink = document.querySelector("a[href='employees.html']");
+            if (employeeLink) {
+                employeeLink.style.display = "none";
+            }
+        }
+    } else {
+        // User login panla-na direct-ah login page-ku anuppidu
+        window.location.href = "login.html";
+    }
+});
+  
+</script>
+
+</body>
+</html>
