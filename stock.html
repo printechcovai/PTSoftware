@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <meta charset="UTF-8">
 <title>Stock Management</title>
 
@@ -16,7 +18,7 @@ body {
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
-  overflow: hidden;   /* FULL page scroll block */
+  overflow: hidden;  
 }
 .container {
   background: white;
@@ -25,8 +27,8 @@ body {
   border-radius: 10px;
   box-shadow: 0 0 25px rgba(0,0,0,0.1);
 
-  max-height: calc(100vh - 50px); /* 👈 screen fit */
-  overflow-y: auto;               /* 👈 ONLY inner scroll */
+  max-height: calc(100vh - 50px); 
+  overflow-y: auto;            
 }
 
 
@@ -40,7 +42,6 @@ h2{
     font-size: 28px ;
 }
 
-/* filters */
 .filters{
   display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -54,7 +55,6 @@ select,input{
   outline:none;
 }
 
-/* save button */
 .save-btn{
   margin-top:20px;
   padding:10px 25px;
@@ -68,7 +68,6 @@ select,input{
   background: linear-gradient(to right,#1aa853, #07AFC0);
 }
 
-/* list */
 .item{
   background:#f7f7f7;
   padding:18px 22px;
@@ -115,10 +114,6 @@ select,input{
     box-shadow: 0 0 15px rgba(0,0,0,0.15);
 }
 
-/* Logo */
-
-
-/* Menu buttons */
 .sidebar a {
     display: block;
     padding: 12px 20px;
@@ -130,12 +125,10 @@ select,input{
     transition: 0.3s;
 }
 
-/* Hover effect */
 .sidebar a:hover {
     background: rgba(255,255,255,0.3);
 }
 
-/* Logout button */
 .sidebar button {
     display: block;
     padding: 12px 20px;
@@ -151,12 +144,12 @@ select,input{
 }
 .main-content {
   margin-left: 230px;
-  height: 100vh;              /* FULL viewport */
+  height: 100vh;              
   padding: 25px;
-  overflow: hidden;           /* body scroll stop */
+  overflow: hidden;           
   display: flex;
   justify-content: center;
-  align-items: flex-start;    /* top align */
+  align-items: flex-start;   
 }
 
 
@@ -169,8 +162,6 @@ select,input{
 }
 
 
-/* PAGE CONTAINER */
- 
 .wave-container {
   position: fixed;
   top: 0;
@@ -195,7 +186,6 @@ select,input{
   flex-shrink: 0;
 }
 
-/* PERFECT seamless animation */
 @keyframes waveMove {
   0% {
     transform: translateX(0);
@@ -207,12 +197,11 @@ select,input{
 
 #available,
 #required{
-  width: 100px;     /* size chinnadha */
+  width: 100px;     
   padding: 6px;
   font-size: 14px;
 }
 
-/* WAVE BACKGROUND */
 .ptimg{
     margin-left: 30px;
     width: 70%;
@@ -248,7 +237,7 @@ select,input{
   font-size: 13px;
 }
 .qty-line {
-  font-size: 13px;   /* 👈 size குறைஞ்சது */
+  font-size: 13px;  
   color: #444;
 }
 
@@ -283,7 +272,7 @@ select,input{
 <div class="container">
 
 <h2>Stock Management</h2>
-<!-- FILTER DROPDOWNS -->
+
 <div class="filters">
   <select onchange="setItemName(this)">
     <option value="">A4 Size</option>
@@ -299,7 +288,7 @@ select,input{
     <option>OHP Sheet</option>
     <option>Tracing Sheet</option>
     <option>Tracing Film</option>
-    <option>Loan Card Common</option>
+    <option>Loan Card Flower</option>
     <option>Loan Card Hindu</option>
     <option>80 GSM Paper(Legal)</option>
     <option>80 GSM Ledger Paper(Legal)</option>
@@ -350,6 +339,10 @@ select,input{
     <option>Metallic Silver</option>
     <option>Metallic Gold</option>
     <option>Metallic Gold Perfume 5018</option>
+    <option>Sythetic Metalic Gold</option>
+    <option>Synthetic Metallic Silver</option>
+    <option>Semi Glossy Heavy Gum</option>
+    <option>Ivory Yellow Board</option>
   </select>
 
   <select onchange="setItemName(this)">
@@ -441,7 +434,6 @@ select,input{
   </select>
 </div>
 
-<!-- ENTRY -->
 <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:20px;">
   <input type="text" id="itemName" placeholder="Item Name" readonly>
   <input type="number" id="available" placeholder="Available">
@@ -456,7 +448,7 @@ select,input{
 </div>
 </div>
 <script type="module">
-  // 1. getDocs sethuttaen, layout disturb aagaadhu
+
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc, onSnapshot, query, doc, updateDoc, deleteDoc, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -480,7 +472,6 @@ select,input{
     } catch(e) { return "Admin"; }
   };
 
-  // --- Functions (Original logic exactly) ---
   window.setItemName = (sel) => {
     const itemNameInput = document.getElementById("itemName");
     if (sel.value !== "") {
@@ -512,7 +503,6 @@ select,input{
     } catch (error) { alert("Error: " + error.message); }
   };
 
-  // --- PUDHU EXPORT LOGIC (No UI Change) ---
   window.exportStock = async () => {
     try {
         const snap = await getDocs(query(stockCol, orderBy("timestamp", "desc")));
@@ -539,7 +529,6 @@ select,input{
   window.deleteStock = async (id) => { if (confirm("Are you sure Do you want delete this data?")) await deleteDoc(doc(db, "StockData", id)); };
   window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
 
-  // --- Real-time List (Unga original grid layout) ---
   onSnapshot(query(stockCol, orderBy("timestamp", "desc")), (snap) => {
     const listDiv = document.getElementById("list");
     listDiv.innerHTML = "";
@@ -581,13 +570,10 @@ select,input{
     });
   });
   window.addEventListener('DOMContentLoaded', () => {
-    // 1. Session-la irundhu user data-va edu
     const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
     
     if (loggedUser) {
-      // 2. Role "Founder" illana Accounts & Expenses-ah maraichidu
       if (loggedUser.role !== "Founder") {
-        // Sidebar-la irukkura Accounts & Expenses links-ah 'id' vechu kandupidi
         const accLink = document.querySelector('a[href="employees.html"]');
         
         
@@ -595,8 +581,7 @@ select,input{
         if (expLink) expLink.style.display = 'none';
       }
     } else {
-      // Login pannala-na veliya thallu
-      window.location.href = "login.html";
+     window.location.href = "login.html";
     }
   });
 </script>
