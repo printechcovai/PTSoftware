@@ -11,7 +11,6 @@ body {
     height: 100vh;
     overflow: hidden;
 
-    /* 🔥 DOT BACKGROUND */
     background: url("bgdot.jpeg") repeat;
 }
 .container {
@@ -21,7 +20,7 @@ body {
     box-shadow: 0 0 25px rgba(0,0,0,0.08);
     border-radius: 12px;
 
-    height: calc(100vh - 80px); /* 🔥 FIXED */
+    height: calc(100vh - 80px);
     overflow-y: auto;
 }
 
@@ -115,47 +114,61 @@ h2 {
     cursor: pointer;
 }
 
-.sidebar {
-    width: 230px;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    background: linear-gradient(#34caca, #1aa853);
-    padding-top: 30px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+.sidebar { 
+    width: 230px; 
+    height: 100vh; 
+    position: fixed; 
+    left: 0; 
+    top: 0; 
+    background: #26bfa3;
+    padding-top: 20px; 
+    z-index: 100; 
 }
 
-.sidebar a {
-    display: block;
-    padding: 12px 20px;
-    margin: 10px 15px;
-    text-decoration: none;
-    color: white;
-    font-size: 16px;
-    border-radius: 20px;
+.ptimg { 
+    margin: 0 auto 30px auto; 
+    width: 180px; 
+    height: 80px;
+    background: #ffffff; 
+    border-radius: 15px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.ptimg img { 
+    width: 150px; 
+}
+
+.sidebar a { 
+    display: block; 
+    padding: 12px 25px; 
+    text-decoration: none; 
+    color: white; 
+    font-size: 16px; 
     transition: 0.3s;
+    font-weight: 500;
 }
 
-
-.sidebar a:hover {
-    background: rgba(255,255,255,0.3);
+.sidebar a:hover { 
+    background: rgba(255, 255, 255, 0.2);
+    padding-left: 35px; 
 }
 
-.sidebar button {
-    display: block;
-    padding: 12px 20px;
-    margin: 10px 15px;
-    text-decoration: none;
-    font-size: 16px;
-    transition: 0.3s;
-    background: white;
-    color: #26bfa3;
-    border-radius: 30px;
-    border: none;
-    font-weight: bold;
+.sidebar button { 
+    display: block; 
+    width: 80%; 
+    padding: 12px; 
+    margin: 40px auto; 
+    background: white; 
+    color: #26bfa3; 
+    font-weight: bold; 
+    border-radius: 10px; 
+    border: none; 
+    cursor: pointer; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-
 * {
   margin: 0;
   padding: 0;
@@ -163,70 +176,38 @@ h2 {
   font-family: Arial, sans-serif;
 }
 .wave-container {
-    position: fixed;
-    top: 0;
-    left: 230px;
-    width: calc(100% - 230px);
-    height: 100vh;
-    overflow: hidden;   /* 🔥 THIS IS KEY */
-    z-index: -1;
+  position: fixed;
+  top: 0;
+  left: 230px;
+  width: calc(100% - 230px);
+  height: 100vh;
+  overflow: hidden;
+  z-index: -1;
 }
-/* 🔥 TRACK THAT MOVES */
+
 .wave-track {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    display: flex;
-    width: 200%;              /* 🔥 FORCE DOUBLE WIDTH */
-    transform: translateY(-50%);
-    animation: waveMove 40s linear infinite;
+  position: absolute;
+  bottom: 7%;
+  display: flex;
+  width: 200%;
+  animation: waveMove 35s linear infinite;
 }
 
-
-/* 🔥 EACH WAVE IMAGE */
 .wave {
-    width: 50%;               /* 🔥 HALF of track */
-    height: auto;
-    flex-shrink: 0;
+  width: 100%;
+  height: auto;
+  flex-shrink: 0;
 }
 
-
-.wave1 {
-  animation: moveWave 30s ease-in-out infinite;
-}
 @keyframes waveMove {
   0% {
-    transform: translate(0, -50%);
+    transform: translateX(0);
   }
   100% {
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
   }
 }
 
-
-
-.ptimg{
-    margin-left: 30px;
-    width: 70%;
-    
-    border-radius: 12px;
-    background: #ffffff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    
-}
-.sidebar img {
-        width: 150px;
-        height: auto;
-        padding: 12px 20px;
-        margin-left: 5px;
-        align-items: center;
-        
-}
-@media (max-width: 1366px) {
-  .wave {
-    width: 100%;
-  }
-}
 </style></head>
 <body>
     <div class="wave-container">
@@ -236,26 +217,21 @@ h2 {
     </div>
   </div>
 
-
-<!-- <div id="flash"></div> -->
     <div class="sidebar">
-            <div class="ptimg"><img src="PTlogo.png" alt=""></div>
-            <br> 
-
+    <div class="ptimg">
+        <img src="PTlogo.png" alt="Printech Logo">
+    </div>
     <a href="home.html">Home</a>
-    <a href="employees.html">Employees</a>
+    <a href="employees.html" id="empLink">Employees</a>
     <a href="attendance.html">Attendance</a>
     <a href="stock.html">Stock</a>
     <a href="cust.html">Customers</a>
     <a href="accounts.html">Accounts</a>
     <a href="expenses.html">Expenses</a>
-
-    <br><br><br><br>
-
+    <a href="customer_data.html">Customer Data</a><br><br><br><br>
+    
     <button onclick="logout()">Logout</button>
 </div>
-    
-<!-- CONTENT -->
  <div class="main-wrapper">
 <div class="container" id="att">
 
@@ -302,12 +278,9 @@ h2 {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // Time format with seconds for calculation
   const formatTime12 = () => {
     return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
   };
-
-  // 1. Fetch Employees
   onSnapshot(collection(db, "EmployeesData"), (snap) => {
     const empSelect = document.getElementById("empSelect");
     empSelect.innerHTML = '<option value="">Select Employee</option>';
@@ -320,7 +293,6 @@ h2 {
     });
   });
 
-  // 2. MARK IN
   document.getElementById("inBtn").onclick = async () => {
     const name = document.getElementById("empSelect").value;
     const date = document.getElementById("attDate").value;
@@ -331,12 +303,10 @@ h2 {
     alert("Marked IN! ✅");
   };
 
-  // 3. MARK OUT
   window.markOut = async (id) => {
     await updateDoc(doc(db, "AttendanceRecords", id), { outTime: formatTime12(), status: "OUT" });
   };
 
-  // 4. DISPLAY LIST (Clean logic without timer)
   onSnapshot(query(collection(db, "AttendanceRecords"), orderBy("timestamp", "desc")), (snap) => {
     const attList = document.getElementById("attendanceList");
     attList.innerHTML = "";
@@ -371,12 +341,10 @@ h2 {
     });
   });
 
-  // LUNCH START
   window.startLunch = async (id) => {
     await updateDoc(doc(db, "AttendanceRecords", id), { lunchOut: formatTime12() });
   };
 
-  // LUNCH END & CALCULATION (No Live Timer)
   window.endLunch = async (id, lOut) => {
     try {
       const lIn = formatTime12();
@@ -406,12 +374,12 @@ h2 {
 
   window.deleteAtt = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "AttendanceRecords", id)); };
   window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
-// Check User Role and Hide Employees Link
+
 document.addEventListener("DOMContentLoaded", () => {
     const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
 
     if (loggedUser) {
-        // "Founder" illa-na Employee link-ah hide pannu
+        
         if (loggedUser.role !== "Founder") {
             const employeeLink = document.querySelector("a[href='employees.html']");
             if (employeeLink) {
@@ -419,12 +387,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     } else {
-        // User login panla-na direct-ah login page-ku anuppidu
+        
         window.location.href = "login.html";
     }
 });
   
 </script>
-
 </body>
 </html>

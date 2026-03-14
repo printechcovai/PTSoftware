@@ -16,35 +16,24 @@
     height: 100vh;
 }
 
-    /* Sidebar */
-    
-
-
-    /* Main Content */
    .content {
     margin-left: 230px;
     width: calc(100% - 230px);
-
     min-height: 100vh;
     display: flex;
-
-    justify-content: center;     /* center horizontally */
-    align-items: center;         /* center vertically */
-
-    padding: 0;                  /* remove top padding */
+    justify-content: center;     
+    align-items: center;       
+    padding: 0;                 
     position: relative;
 }
 
-
    .content {
     margin-left: 230px;
     width: calc(100% - 230px);
     min-height: 100vh;
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     padding: 0;
 }
 
@@ -54,120 +43,123 @@
     display: flex;
     justify-content: center;
 }
-
-    /* Card Style Exact Match */
   .card {
     width: 420px;
     background: white;
     padding: 40px;
     border-radius: 12px;
     box-shadow: 0 0 20px rgba(0,0,0,0.15);
-
-    margin: 0 !important;   /* force remove all margins */
+    margin: 0 !important;  
 }
 
-
-
-    .card h2 {
-        margin: 0;
-      display: inline-block;
+.card h2 {
+    margin: 0;
+    display: inline-block;
     background: linear-gradient(to right, #07AFC0, #1aa853);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-        font-size: 28px;
-    }
+    font-size: 28px;
+}
 .card h3 {
-display: inline-block;
+    display: inline-block;
     background: linear-gradient(to right, #07AFC0, #1aa853);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-size: 32px;
 }
-    /* Data Row */
-    .row {
-        margin-top: 40px;
-    }
-
-    .label {
-        font-size: 16px;
-        display: inline-block;
-        width: 70%;
-    }
-
-    .value {
-        font-size: 16px;
-        font-weight: bold;
-    }
-
-    .line {
-        width: 100%;
-        border-bottom: 1px solid #ddd;
-        margin-top: 5px;
-    }
-
-    .view-btn {
-        margin-top: 12px;
-        background: linear-gradient(to right, #07AFC0, #1aa853);
-        border: none;
-        color: white;
-        padding: 6px 25px;
-        border-radius: 5px;
-        font-size: 14px;
-        cursor: pointer;
-        text-decoration: none;
-    }
-    .view-btn:hover {
-        background: linear-gradient(to right,#1aa853, #07AFC0);
-    }
-    .sidebar {
-    width: 230px;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    background: linear-gradient(#34caca, #1aa853);
-    padding-top: 30px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.15);
-}
-
-
-
-
-.sidebar a {
-    display: block;
-    padding: 12px 20px;
-    margin: 10px 15px;
-    text-decoration: none;
-    color: white;
-    font-size: 16px;
-    border-radius: 20px;
-    transition: 0.3s;
     
-
+.row {
+    margin-top: 40px;
 }
 
-
-    .sidebar button {
-        display: block;
-    padding: 12px 20px;
-    margin: 10px 15px;
-    text-decoration: none;
+.label {
     font-size: 16px;
-    transition: 0.3s;
-        background: white;
-        color: #26bfa3;
-        border-radius: 30px;
-        border: none;
-        font-weight: bold;
-        margin-bottom: 20px;
-        transition: 0.3s;
-    }
-
-.sidebar a:hover {
-    background: rgba(255,255,255,0.3);
+    display: inline-block;
+    width: 70%;
 }
 
+.value {
+    font-size: 16px;
+    font-weight: bold;
+}
 
+.line {
+    width: 100%;
+    border-bottom: 1px solid #ddd;
+    margin-top: 5px;
+}
+
+.view-btn {
+    margin-top: 12px;
+    background: linear-gradient(to right, #07AFC0, #1aa853);
+    border: none;
+    color: white;
+    padding: 6px 25px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.view-btn:hover {
+    background: linear-gradient(to right,#1aa853, #07AFC0);
+}
+
+ .sidebar { 
+    width: 230px; 
+    height: 100vh; 
+    position: fixed; 
+    left: 0; 
+    top: 0; 
+    background: #26bfa3; 
+    padding-top: 20px; 
+    z-index: 100; 
+}
+
+.ptimg { 
+    margin: 0 auto 30px auto; 
+    width: 180px; 
+    height: 80px;
+    background: #ffffff; 
+    border-radius: 15px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.ptimg img { 
+    width: 150px; 
+}
+
+.sidebar a { 
+    display: block; 
+    padding: 12px 25px; 
+    text-decoration: none; 
+    color: white; 
+    font-size: 16px; 
+    transition: 0.3s;
+    font-weight: 500;
+}
+
+.sidebar a:hover { 
+    background: rgba(255, 255, 255, 0.2);
+    padding-left: 35px; 
+}
+
+.sidebar button { 
+    display: block; 
+    width: 80%; 
+    padding: 12px; 
+    margin: 40px auto; 
+    background: white; 
+    color: #26bfa3; 
+    font-weight: bold; 
+    border-radius: 10px; 
+    border: none; 
+    cursor: pointer; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
 
 * {
   margin: 0;
@@ -176,10 +168,6 @@ display: inline-block;
   font-family: Arial, sans-serif;
 }
 
-
-
-/* PAGE CONTAINER */
- 
 .wave-container {
   position: fixed;
   top: 0;
@@ -204,7 +192,7 @@ display: inline-block;
   flex-shrink: 0;
 }
 
-/* PERFECT seamless animation */
+
 @keyframes waveMove {
   0% {
     transform: translateX(0);
@@ -213,25 +201,6 @@ display: inline-block;
     transform: translateX(-50%);
   }
 }
-
-.ptimg{
-    margin-left: 30px;
-    width: 70%;
-    
-    border-radius: 12px;
-    background: #ffffff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    
-}
-.sidebar img {
-        width: 150px;
-        height: auto;
-        padding: 12px 20px;
-        margin-left: 5px;
-        align-items: center;
-        
-}
-
 </style>
 </head>
 <body>
@@ -241,36 +210,26 @@ display: inline-block;
     <img src="Software.png" class="wave">
   </div>
 </div>
-
-<!-- Sidebar -->
 <div class="sidebar">
     <div class="ptimg"><img src="PTlogo.png" alt=""></div> 
-    <br>
-     <a href="home.html">Home</a>
+   
+    <a href="home.html">Home</a>
     <a href="employees.html">Employees</a>
     <a href="attendance.html">Attendance</a>
     <a href="stock.html">Stock</a>
     <a href="cust.html">Customers</a>
     <a href="accounts.html">Accounts</a>
-    <a href="expenses.html">Expenses</a><br><br><br><br>
+    <a href="expenses.html">Expenses</a>
+    <a href="customer_data.html">Customer Data</a><br><br><br><br>
 
     <button onclick="logout()">Logout</button>
 </div>
 
-
-
-
-<!-- HOME PAGE -->
 <div id="home" class="content active">
     <div class="home-box">
         <div class="card">
     <h2>Hi,</h2><br>
     <h3 id="empUserDisplay"></h3>
-
-
-
-        
-
         <div class="row">
             <span class="label">Employees Logged In</span>
             <span class="value" id="empCount">00</span>
@@ -291,15 +250,10 @@ display: inline-block;
             <span class="value" id="pendingCustomerCount">00</span>
             <div class="line"></div><br>
             <a class="view-btn" href="cust.html">View</a>
-            <!-- <button class="view-btn">View</button> -->
         </div>
     </div>
 </div>
 </div>
-
-
-<!-- OTHER PAGES -->
-
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -318,7 +272,7 @@ display: inline-block;
   const db = getFirestore(app);
 
   document.addEventListener("DOMContentLoaded", () => {
-    // --- 1. Session & Role Check ---
+    
     const logged = JSON.parse(sessionStorage.getItem("loggedUser"));
     if (!logged) {
         window.location.href = "login.html";
@@ -327,9 +281,8 @@ display: inline-block;
 
     document.getElementById("empUserDisplay").innerText = logged.user || logged.name;
 
-    // --- 🔐 ROLE BASED SIDEBAR HIDING ---
     if (logged.role !== "Founder") {
-        // Founder illana restrict panna vendiya links
+        
         const restricted = ["employees.html"];
         restricted.forEach(page => {
             const link = document.querySelector(`a[href="${page}"]`);
@@ -337,21 +290,18 @@ display: inline-block;
         });
     }
 
-    // --- 2. LIVE ATTENDANCE COUNT (FIXED) ---
 onSnapshot(collection(db, "AttendanceRecords"), (snap) => {
     let presentStaffs = new Set();
     
-    // Machi, system date-ah YYYY-MM-DD format-ku mathurom
     const now = new Date();
     const offset = now.getTimezoneOffset();
     const adjustedDate = new Date(now.getTime() - (offset * 60 * 1000));
     const todayStr = adjustedDate.toISOString().split('T')[0]; 
 
-    console.log("Checking for date:", todayStr); // Debug panna idhu use aagum
+    console.log("Checking for date:", todayStr); 
 
     snap.forEach(doc => {
         const a = doc.data();
-        // Attendance Page-la status "IN"-nu irundha mattum count edukkurom
         if(a.date === todayStr && a.status === "IN") {
             presentStaffs.add(a.employeeName);
         }
@@ -360,17 +310,14 @@ onSnapshot(collection(db, "AttendanceRecords"), (snap) => {
     const empElem = document.getElementById("empCount");
     if(empElem) {
         empElem.innerText = presentStaffs.size.toString().padStart(2, '0');
-        // Staffs irundha green color, illana black
         empElem.style.color = presentStaffs.size > 0 ? "#1aa853" : "black";
     }
 });
-    // --- 3. LIVE STOCK COUNT ---
     onSnapshot(query(collection(db, "StockData"), where("status", "==", "Low")), (snap) => {
         document.getElementById("urgentStockCount").innerText = snap.size.toString().padStart(2, '0');
         document.getElementById("urgentStockCount").style.color = snap.size > 0 ? "red" : "black";
     });
 
-    // --- 4. LIVE PENDING CUSTOMERS ---
     onSnapshot(collection(db, "SoftwareData"), (snap) => {
         let pendingCount = 0;
         snap.forEach(doc => {
@@ -382,7 +329,7 @@ onSnapshot(collection(db, "AttendanceRecords"), (snap) => {
   });
 
   window.logout = () => {
-    sessionStorage.clear();
+    
     window.location.href = "login.html";
   };
   

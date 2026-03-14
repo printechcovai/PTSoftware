@@ -7,28 +7,24 @@
 <title>Accounts</title>
 
 <style>
-     html, body {
+  html, body {
   height: 100%;
   margin: 0;
-  overflow-x: hidden;   /* ✅ only x hide */
-  overflow-y: hidden;   /* page scroll venam */
+  overflow-x: hidden; 
   font-family: Tahoma, sans-serif;
   background-image: url(bgdot.jpeg);
 }
 .container {
   position: relative;
   width: 900px;
-  max-height: calc(100vh - 60px); /* 🔥 screen fit */
+  max-height: calc(100vh - 60px);
   background: #ffffff;
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 0 25px rgba(0,0,0,0.08);
-
   z-index: 1;
-  overflow-y: auto;   /* ✅ ONLY SCROLL HERE */
+  overflow-y: auto;  
 }
-
-
 
 .container h2 {
     display: inline-block;
@@ -40,13 +36,11 @@
     font-weight: bold;
     
 }
-
     h1 {
         margin-left: 5%;
         color: #67B200;
     }
 
-    /* FORM DESIGN */
     .form-box {
         background: #fff;
         width: 100%;
@@ -85,7 +79,6 @@
     .container button:hover {
         background: linear-gradient(to right,#1aa853, #07AFC0);
     }
-    /* TABLE */
     table {
         width: 100%;
         margin-top: 30PX;
@@ -129,47 +122,60 @@
         cursor: pointer;
     }
 
-    .sidebar {
-    width: 230px;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    background: linear-gradient(#34caca, #1aa853);
-    padding-top: 30px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+ .sidebar { 
+    width: 230px; 
+    height: 100vh; 
+    position: fixed; 
+    left: 0; 
+    top: 0; 
+    background: #26bfa3; 
+    padding-top: 20px; 
+    z-index: 100; 
 }
 
-/* Menu buttons */
-.sidebar a {
-    display: block;
-    padding: 12px 20px;
-    margin: 10px 15px;
-    text-decoration: none;
-    color: white;
-    font-size: 16px;
-    border-radius: 20px;
+.ptimg { 
+    margin: 0 auto 30px auto; 
+    width: 180px; 
+    height: 80px;
+    background: #ffffff; 
+    border-radius: 15px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.ptimg img { 
+    width: 150px; 
+}
+
+.sidebar a { 
+    display: block; 
+    padding: 12px 25px; 
+    text-decoration: none; 
+    color: white; 
+    font-size: 16px; 
     transition: 0.3s;
+    font-weight: 500;
 }
 
-/* Hover effect */
-.sidebar a:hover {
-    background: rgba(255,255,255,0.3);
+.sidebar a:hover { 
+    background: rgba(255, 255, 255, 0.2);
+    padding-left: 35px; 
 }
 
-/* Logout button */
-.sidebar button {
-    display: block;
-    padding: 12px 20px;
-    margin: 10px 15px;
-    text-decoration: none;
-    font-size: 16px;
-    transition: 0.3s;
-    background: white;
-    color: #26bfa3;
-    border-radius: 30px;
-    border: none;
-    font-weight: bold;
+.sidebar button { 
+    display: block; 
+    width: 80%; 
+    padding: 12px; 
+    margin: 40px auto; 
+    background: white; 
+    color: #26bfa3; 
+    font-weight: bold; 
+    border-radius: 10px; 
+    border: none; 
+    cursor: pointer; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 * {
@@ -179,7 +185,6 @@
   font-family: Arial, sans-serif;
 }
 
-/* PAGE CONTAINER */
 .page-wrap {
   margin-left: 230px;
   width: calc(100% - 230px);
@@ -187,7 +192,7 @@
   display: flex;
   justify-content: center;
   padding: 30px 0;
-  overflow: hidden;   /* 🔥 page scroll block */
+  overflow: hidden;   
 }
 
 .wave-container {
@@ -197,7 +202,7 @@
   width: calc(100% - 230px);
   height: 100vh;
   overflow: hidden;
-  z-index: 0;          /* 🔥 -1 REMOVE */
+  z-index: 0;         
   pointer-events: none;
 }
 
@@ -217,7 +222,6 @@
   flex-shrink: 0;
 }
 
-/* PERFECT seamless animation */
 @keyframes waveMove {
   0% {
     transform: translateX(0);
@@ -227,24 +231,7 @@
   }
 }
 
-.ptimg{
-    margin-left: 30px;
-    width: 70%;
-    
-    border-radius: 12px;
-    background: #ffffff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    
-}
-.sidebar img {
-        width: 150px;
-        height: auto;
-        padding: 12px 20px;
-        margin-left: 5px;
-        align-items: center;
-        
-}
-/* 🔥 Only table details small */
+
 table td {
     font-size: 14px;
 }
@@ -258,28 +245,24 @@ table td {
   </div>
 </div>
     <div class="sidebar">
-            <div class="ptimg"><img src="PTlogo.png" alt=""></div>
-            <br> 
-
+    <div class="ptimg">
+        <img src="PTlogo.png" alt="Printech Logo">
+    </div>
     <a href="home.html">Home</a>
-    <a href="employees.html">Employees</a>
+    <a href="employees.html" id="empLink">Employees</a>
     <a href="attendance.html">Attendance</a>
     <a href="stock.html">Stock</a>
     <a href="cust.html">Customers</a>
     <a href="accounts.html">Accounts</a>
     <a href="expenses.html">Expenses</a>
-
-    <br><br><br><br>
-
+    <a href="customer_data.html">Customer Data</a><br><br><br><br>
+    
     <button onclick="logout()">Logout</button>
 </div>
 <div class="page-wrap">
 <div class="container">
 
 <h2>Accounts</h2>
-<!-- =========================
-        FORM INPUT
-========================= -->
 <div class="form-box">
 
     <div class="form-row">
@@ -293,9 +276,6 @@ table td {
     </div>
 
     <button onclick="saveAccount()">Save</button>
-<!-- =========================
-        DISPLAY TABLE
-========================= -->
 <table>
     <thead>
         <tr>
@@ -303,7 +283,7 @@ table td {
             <th>Job</th>
             <th>Total Amount</th>
             <th>Mobile Number</th>
-<th>Added By</th>   <!-- 🔥 -->
+<th>Added By</th>
 <th>Actions</th>
 
         </tr>
@@ -314,6 +294,13 @@ table td {
 <button onclick="exportAccounts()" style="background: #1aa853; margin-left: 10px;">📥 Export Accounts</button>
 </div>
 </div>
+
+<div class="row" style="margin-bottom: 20px;">
+    <div class="inputGroup" style="width: 100%;">
+        <input type="text" id="searchInput" placeholder="Search Customer Name..." onkeyup="searchOrders()" style="border-bottom: 3px solid #07AFC0;">
+    </div>
+</div>
+
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -339,7 +326,6 @@ table td {
     return user ? (user.user || user.name) : "Unknown";
   };
 
-  // 🔥 EXPORT FUNCTION (Global scope-ku window-la attach panren)
   window.exportAccounts = async () => {
     try {
         const snap = await getDocs(query(accCol, orderBy("timestamp", "desc")));
@@ -365,7 +351,6 @@ table td {
     } catch (e) { alert("Export Error: " + e.message); }
   };
 
-  // 🔥 SAVE FUNCTION (Global scope)
   window.saveAccount = async () => {
     const a = document.getElementById("agent").value.trim();
     const j = document.getElementById("job").value.trim();
@@ -391,7 +376,6 @@ table td {
     } catch (e) { alert("Error: " + e.message); }
   };
 
-  // 🔥 OTHERS
   window.updateAccountStatus = async (id, data) => { await updateDoc(doc(db, "AccountsData", id), data); };
   window.deleteAcc = async (id) => { if (confirm("Are you sure Do you want delete?")) await deleteDoc(doc(db, "AccountsData", id)); };
   window.editAcc = async (id) => {
@@ -417,7 +401,6 @@ table td {
     document.querySelector(".form-box button").innerText = "Save";
   }
 
-  // 🔥 REALTIME LISTENER
   onSnapshot(query(accCol, orderBy("timestamp", "desc")), (snap) => {
     const accTable = document.getElementById("accTable");
     accTable.innerHTML = "";
@@ -449,23 +432,53 @@ table td {
     });
   });
   window.addEventListener('DOMContentLoaded', () => {
-    // 1. Session-la irundhu user data-va edu
+  
     const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
     
     if (loggedUser) {
-      // 2. Role "Founder" illana Accounts & Expenses-ah maraichidu
       if (loggedUser.role !== "Founder") {
-        // Sidebar-la irukkura Accounts & Expenses links-ah 'id' vechu kandupidi
         const accLink = document.querySelector('a[href="employees.html"]');
       
         if (accLink) accLink.style.display = 'none';
         if (expLink) expLink.style.display = 'none';
       }
     } else {
-      // Login pannala-na veliya thallu
       window.location.href = "login.html";
     }
   });
+
+  window.markDelivered = async (id) => {
+        if(confirm("Confirm Delivery? Data will move to Customer Data page.")) {
+            try {
+                const docRef = db.collection("SoftwareData").doc(id);
+                const doc = await docRef.get();
+                if (doc.exists) {
+                    
+                    await db.collection("DeliveredOrders").doc(id).set({
+                        ...doc.data(),
+                        isDelivered: true,
+                        deliveredAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    await docRef.delete();
+                    alert("Order Moved to Customer Data! ✅");
+                }
+            } catch(e) { alert(e.message); }
+        }
+    };
+
+    function searchOrders() {
+        let filter = document.getElementById("searchInput").value.toUpperCase();
+        let rows = document.getElementsByClassName("orderRow");
+        for (let i = 0; i < rows.length; i++) {
+            let name = rows[i].getElementsByTagName("b")[0].innerText;
+            if (name.toUpperCase().indexOf(filter) > -1) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
 </script>
 </body>
 </html>

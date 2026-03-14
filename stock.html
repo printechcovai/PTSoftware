@@ -103,45 +103,62 @@ select,input{
   color:green;
   font-weight:bold;
 }
-  .sidebar {
-    width: 230px;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    background: linear-gradient(#34caca, #1aa853);  /* same as your screenshot */
-    padding-top: 30px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+   .sidebar { 
+    width: 230px; 
+    height: 100vh; 
+    position: fixed; 
+    left: 0; 
+    top: 0; 
+    background: #26bfa3;
+    padding-top: 20px; 
+    z-index: 100; 
 }
 
-.sidebar a {
-    display: block;
-    padding: 12px 20px;
-    margin: 10px 15px;
-    text-decoration: none;
-    color: white;
-    font-size: 16px;
-    border-radius: 20px;
+.ptimg { 
+    margin: 0 auto 30px auto; 
+    width: 180px; 
+    height: 80px;
+    background: #ffffff; 
+    border-radius: 15px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.ptimg img { 
+    width: 150px; 
+}
+
+.sidebar a { 
+    display: block; 
+    padding: 12px 25px; 
+    text-decoration: none; 
+    color: white; 
+    font-size: 16px; 
     transition: 0.3s;
+    font-weight: 500;
 }
 
-.sidebar a:hover {
-    background: rgba(255,255,255,0.3);
+.sidebar a:hover { 
+    background: rgba(255, 255, 255, 0.2);
+    padding-left: 35px;
 }
 
-.sidebar button {
-    display: block;
-    padding: 12px 20px;
-    margin: 10px 15px;
-    text-decoration: none;
-    font-size: 16px;
-    transition: 0.3s;
-    background: white;
-    color: #26bfa3;
-    border-radius: 30px;
-    border: none;
-    font-weight: bold;
+.sidebar button { 
+    display: block; 
+    width: 80%; 
+    padding: 12px; 
+    margin: 40px auto; 
+    background: white; 
+    color: #26bfa3; 
+    font-weight: bold; 
+    border-radius: 10px; 
+    border: none; 
+    cursor: pointer; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
+
 .main-content {
   margin-left: 230px;
   height: 100vh;              
@@ -202,23 +219,7 @@ select,input{
   font-size: 14px;
 }
 
-.ptimg{
-    margin-left: 30px;
-    width: 70%;
-    
-    border-radius: 12px;
-    background: #ffffff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    
-}
-.sidebar img {
-        width: 150px;
-        height: auto;
-        padding: 12px 20px;
-        margin-left: 5px;
-        align-items: center;
-        
-}
+
 .followedUnder {
   font-size: 14px;
   color: #333;
@@ -250,19 +251,18 @@ select,input{
   </div>
 </div>
     <div class="sidebar">
-    <div class="ptimg"><img src="PTlogo.png" alt=""></div>
-    <br>
-
+    <div class="ptimg">
+        <img src="PTlogo.png" alt="Printech Logo">
+    </div>
     <a href="home.html">Home</a>
-    <a href="employees.html">Employees</a>
+    <a href="employees.html" id="empLink">Employees</a>
     <a href="attendance.html">Attendance</a>
     <a href="stock.html">Stock</a>
     <a href="cust.html">Customers</a>
     <a href="accounts.html">Accounts</a>
     <a href="expenses.html">Expenses</a>
-
-    <br><br><br><br>
-
+    <a href="customer_data.html">Customer Data</a><br><br><br><br>
+    
     <button onclick="logout()">Logout</button>
 </div>
 
@@ -525,7 +525,51 @@ select,input{
   };
 
   window.followStock = async (id) => { await updateDoc(doc(db, "StockData", id), { followedBy: getUsername() }); };
-  window.markAsDone = async (id) => { await updateDoc(doc(db, "StockData", id), { done: true, status: "OK" }); };
+  window.markAsDone = async (id, itemName) => {
+    const amtInput = document.getElementById(`amt-${id}`);
+    const amount = parseFloat(amtInput.value);
+
+    
+    if (amtInput && (isNaN(amount) || amount <= 0)) {
+        return alert("Please enter a valid amount!");
+    }
+
+    try {
+        const now = new Date();
+        const dateStr = now.getDate().toString().padStart(2,'0') + "/" +
+                        (now.getMonth()+1).toString().padStart(2,'0') + "/" +
+                        now.getFullYear();
+        const rawDate = now.toISOString().split('T')[0];
+
+       
+        await updateDoc(doc(db, "StockData", id), { 
+            done: true, 
+            status: "OK" 
+        });
+
+        
+        if (amtInput) {
+            const expCol = collection(db, "ExpensesData");
+            await addDoc(expCol, {
+                shop: "Stock Purchase", 
+                item: itemName,
+                amount: amount,
+                date: dateStr,
+                rawDate: rawDate,
+                addedBy: getUsername(),
+                approvedBy: "",
+                paidBy: "",
+                isPaid: false,
+                timestamp: now
+            });
+            alert("Stock Updated & Added to Expenses! ✅");
+        } else {
+            alert("Stock Marked as Done! ✅");
+        }
+    } catch (e) {
+        alert("Error: " + e.message);
+    }
+};
   window.deleteStock = async (id) => { if (confirm("Are you sure Do you want delete this data?")) await deleteDoc(doc(db, "StockData", id)); };
   window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
 
@@ -575,8 +619,6 @@ select,input{
     if (loggedUser) {
       if (loggedUser.role !== "Founder") {
         const accLink = document.querySelector('a[href="employees.html"]');
-        
-        
         if (accLink) accLink.style.display = 'none';
         if (expLink) expLink.style.display = 'none';
       }
