@@ -91,9 +91,17 @@ select,input{
   color:#fff;
   cursor:pointer;
 }
-.delete{background:#ec0202}
-.follow{background:#11a9cf}
-.donebtn{background:#7eca03}
+.delete{
+  background:#ec0202
+}
+
+.follow{
+  background:#11a9cf
+}
+
+.donebtn{
+  background:#7eca03
+}
 
 .tick{
   margin-left:12px;
@@ -167,15 +175,12 @@ select,input{
   align-items: flex-start;   
 }
 
-
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: Arial, sans-serif;
 }
-
 
 .wave-container {
   position: fixed;
@@ -217,16 +222,17 @@ select,input{
   font-size: 14px;
 }
 
-
 .followedUnder {
   font-size: 14px;
   color: #333;
   margin-top: 5px;
   display: inline-block;
 }
+
 .item small-box {
   width: 80px;
 }
+
 .item span.qty {
   display: inline-block;
   min-width: 70px;
@@ -235,6 +241,7 @@ select,input{
   border-radius: 5px;
   font-size: 13px;
 }
+
 .qty-line {
   font-size: 13px;  
   color: #444;
@@ -261,16 +268,11 @@ select,input{
     <a href="expenses.html">Expenses</a>
     <a href="customer_data.html">Customer Data</a><br><br><br><br>
     
-    <button onclick="logout()">Logout</button>
+<button onclick="logout()">Logout</button>
 </div>
-
-
-
 <div class="main-content">
 <div class="container">
-
 <h2>Stock Management</h2>
-
 <div class="filters">
   <select onchange="setItemName(this)">
     <option value="">A4 Size</option>
@@ -437,9 +439,7 @@ select,input{
       <input type="text" id="fromShop" placeholder="From (Shop Name)">
       <input type="number" id="required" placeholder="Required">
     </div>
-
     <button class="save-btn" onclick="saveStock()">Place Order</button>
-
     <hr style="margin:30px 0">
     <div id="list"></div>
     <button class="save-btn" style="background: #1aa853; margin-left: 10px;" onclick="exportStock()">📥 Export Stock List</button>
@@ -449,7 +449,6 @@ select,input{
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc, onSnapshot, query, doc, updateDoc, deleteDoc, orderBy, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
   const firebaseConfig = {
     apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
     authDomain: "printech-c101a.firebaseapp.com",
@@ -462,14 +461,12 @@ select,input{
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const stockCol = collection(db, "StockData");
-
   const getLoggedUser = () => JSON.parse(sessionStorage.getItem("loggedUser"));
   const getUsername = () => {
-    const user = getLoggedUser();
-    return user ? (user.user || user.name) : "Admin";
+  const user = getLoggedUser();
+  return user ? (user.user || user.name) : "Admin";
   };
 
-  // Sidebar Role Logic
   window.addEventListener('DOMContentLoaded', () => {
     const user = getLoggedUser();
     if (user && user.role !== "Founder") {
@@ -489,7 +486,7 @@ select,input{
     const name = document.getElementById("itemName").value;
     const from = document.getElementById("fromShop").value;
     const req = document.getElementById("required").value;
-    if (!name || !from || !req) return alert("Machi, details fill pannu!");
+    if (!name || !from || !req) return alert("Kindly FIll the details!");
 
     try {
       const now = new Date();
@@ -511,15 +508,13 @@ select,input{
 
   window.markAsDone = async (id, itemName, shopName) => {
     const amt = document.getElementById(`amt-${id}`).value;
-    if (!amt || amt <= 0) return alert("Amount enter pannu machi!");
+    if (!amt || amt <= 0) return alert("Enter the amount!");
 
     try {
       const now = new Date();
-      // 1. Mark as Done
       await updateDoc(doc(db, "StockData", id), { done: true });
-      // 2. Send to Expenses with Shop Name from Stock
       await setDoc(doc(db, "ExpensesData", `Stock-${Date.now()}`), {
-        shop: shopName, // Inga dhaan 'From' shop name vizhum
+        shop: shopName, 
         item: itemName,
         amount: Number(amt),
         date: now.toLocaleDateString('en-GB'),

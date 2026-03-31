@@ -221,7 +221,6 @@
     <a href="accounts.html">Accounts</a>
     <a href="expenses.html">Expenses</a>
     <a href="customer_data.html">Customer Data</a><br><br><br><br>
-
     <button onclick="logout()">Logout</button>
 </div>
 
@@ -270,15 +269,12 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-
   document.addEventListener("DOMContentLoaded", () => {
-    
     const logged = JSON.parse(sessionStorage.getItem("loggedUser"));
     if (!logged) {
         window.location.href = "login.html";
         return;
     }
-
     document.getElementById("empUserDisplay").innerText = logged.user || logged.name;
 
     if (logged.role !== "Founder") {
