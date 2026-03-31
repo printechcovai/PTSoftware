@@ -232,9 +232,8 @@ h2 {
     
     <button onclick="logout()">Logout</button>
 </div>
- <div class="main-wrapper">
+<div class="main-wrapper">
 <div class="container" id="att">
-
     <h2>Attendance</h2>
 
     <div class="row">
@@ -250,18 +249,20 @@ h2 {
             <input type="date" id="attDate">
         </div>
 
-        <div class="inputGroup"></div>
+        <div class="inputGroup">
+            <label>Search Attendance</label>
+            <input type="text" id="searchEmp" placeholder="Search Employee Name...">
+        </div>
     </div>
 
     <div class="btnRow">
         <button id="inBtn">IN</button>
-        
     </div>
 
     <div id="attendanceList"></div>
+</div>
+</div>
 
-</div>
-</div>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc, onSnapshot, query, deleteDoc, doc, orderBy, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -278,9 +279,12 @@ h2 {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  let allAttendance = []; 
+
   const formatTime12 = () => {
     return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
   };
+
   onSnapshot(collection(db, "EmployeesData"), (snap) => {
     const empSelect = document.getElementById("empSelect");
     empSelect.innerHTML = '<option value="">Select Employee</option>';
@@ -293,6 +297,53 @@ h2 {
     });
   });
 
+  onSnapshot(query(collection(db, "AttendanceRecords"), orderBy("timestamp", "desc")), (snap) => {
+    allAttendance = [];
+    snap.forEach(docSnap => {
+      allAttendance.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    renderAttendance(allAttendance); 
+  });
+
+  document.getElementById("searchEmp").oninput = (e) => {
+    const term = e.target.value.toLowerCase();
+    const filtered = allAttendance.filter(item => 
+      item.employeeName.toLowerCase().includes(term)
+    );
+    renderAttendance(filtered);
+  };
+
+  function renderAttendance(data) {
+    const attList = document.getElementById("attendanceList");
+    attList.innerHTML = "";
+    data.forEach(d => {
+      const formattedDate = d.date ? d.date.split("-").reverse().join("/") : "-";
+      let card = document.createElement("div");
+      card.className = "attCard";
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="flex: 1;">
+                <p><b>${d.employeeName}</b> | <small>${formattedDate}</small></p>
+                <p style="font-size: 13px;">IN: ${d.inTime} | OUT: ${d.outTime}</p>
+                <div style="margin-top: 8px;">
+                    ${d.status === 'IN' ? `<button onclick="markOut('${d.id}')" style="background: linear-gradient(to right, #07AFC0, #1aa853); color:white; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;">MARK OUT</button>` : ""}
+                    <button class="delBtn" onclick="deleteAtt('${d.id}')" style="padding: 5px 12px; font-size:12px;">Delete</button>
+                </div>
+            </div>
+            <div style="width: 220px; background: #f4f9fb; padding: 10px; border-radius: 8px; border-left: 4px solid #07AFC0; font-size: 12px;">
+                <p style="margin: 0 0 5px 0;"><b>Out:</b> ${d.lunchOut || '-'}</p>
+                <p style="margin: 0 0 5px 0;"><b>In:</b> ${d.lunchIn || '-'}</p>
+                <p style="margin: 5px 0; color: #1aa853;"><b>Duration:</b> ${d.lunchDuration || '-'}</p>
+                <div style="margin-top: 5px;">
+                    ${!d.lunchOut ? `<button onclick="startLunch('${d.id}')" style="background: linear-gradient(to right, #07AFC0, #26bfa3); color:white; border:none; padding:5px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">Lunch OUT</button>` : ""}
+                    ${d.lunchOut && !d.lunchIn ? `<button onclick="endLunch('${d.id}', '${d.lunchOut}')" style="background: linear-gradient(to right, #1aa853, #07AFC0); color:white; border:none; padding:5px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">Lunch IN</button>` : ""}
+                </div>
+            </div>
+        </div>`;
+      attList.appendChild(card);
+    });
+  }
+
   document.getElementById("inBtn").onclick = async () => {
     const name = document.getElementById("empSelect").value;
     const date = document.getElementById("attDate").value;
@@ -303,52 +354,11 @@ h2 {
     alert("Marked IN! ✅");
   };
 
-  window.markOut = async (id) => {
-    await updateDoc(doc(db, "AttendanceRecords", id), { outTime: formatTime12(), status: "OUT" });
-  };
-
-  onSnapshot(query(collection(db, "AttendanceRecords"), orderBy("timestamp", "desc")), (snap) => {
-    const attList = document.getElementById("attendanceList");
-    attList.innerHTML = "";
-    snap.forEach(docSnap => {
-      const d = docSnap.data();
-      const id = docSnap.id;
-      const formattedDate = d.date ? d.date.split("-").reverse().join("/") : "-";
-
-      let card = document.createElement("div");
-      card.className = "attCard";
-      card.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div style="flex: 1;">
-                <p><b>${d.employeeName}</b> | <small>${formattedDate}</small></p>
-                <p style="font-size: 13px;">IN: ${d.inTime} | OUT: ${d.outTime}</p>
-                <div style="margin-top: 8px;">
-                    ${d.status === 'IN' ? `<button onclick="markOut('${id}')" style="background: linear-gradient(to right, #07AFC0, #1aa853); color:white; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;">MARK OUT</button>` : ""}
-                    <button class="delBtn" onclick="deleteAtt('${id}')" style="padding: 5px 12px; font-size:12px;">Delete</button>
-                </div>
-            </div>
-            <div style="width: 220px; background: #f4f9fb; padding: 10px; border-radius: 8px; border-left: 4px solid #07AFC0; font-size: 12px;">
-                <p style="margin: 0 0 5px 0;"><b>Out:</b> ${d.lunchOut || '-'}</p>
-                <p style="margin: 0 0 5px 0;"><b>In:</b> ${d.lunchIn || '-'}</p>
-                <p style="margin: 5px 0; color: #1aa853;"><b>Duration:</b> ${d.lunchDuration || '-'}</p>
-                <div style="margin-top: 5px;">
-                    ${!d.lunchOut ? `<button onclick="startLunch('${id}')" style="background: linear-gradient(to right, #07AFC0, #26bfa3); color:white; border:none; padding:5px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">Lunch OUT</button>` : ""}
-                    ${d.lunchOut && !d.lunchIn ? `<button onclick="endLunch('${id}', '${d.lunchOut}')" style="background: linear-gradient(to right, #1aa853, #07AFC0); color:white; border:none; padding:5px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">Lunch IN</button>` : ""}
-                </div>
-            </div>
-        </div>`;
-      attList.appendChild(card);
-    });
-  });
-
-  window.startLunch = async (id) => {
-    await updateDoc(doc(db, "AttendanceRecords", id), { lunchOut: formatTime12() });
-  };
-
+  window.markOut = async (id) => { await updateDoc(doc(db, "AttendanceRecords", id), { outTime: formatTime12(), status: "OUT" }); };
+  window.startLunch = async (id) => { await updateDoc(doc(db, "AttendanceRecords", id), { lunchOut: formatTime12() }); };
   window.endLunch = async (id, lOut) => {
     try {
       const lIn = formatTime12();
-      
       const parse = (ts) => {
         const [t, m] = ts.split(' ');
         const parts = t.split(':');
@@ -359,39 +369,27 @@ h2 {
         d.setHours(hrs, parseInt(parts[1]), parseInt(parts[2]), 0);
         return d;
       };
-
       const diff = new Date() - parse(lOut);
       const hh = Math.floor(diff / 3600000).toString().padStart(2, '0');
       const mm = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
       const ss = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-      
-      await updateDoc(doc(db, "AttendanceRecords", id), { 
-        lunchIn: lIn, 
-        lunchDuration: `${hh}:${mm}:${ss}` 
-      });
+      await updateDoc(doc(db, "AttendanceRecords", id), { lunchIn: lIn, lunchDuration: `${hh}:${mm}:${ss}` });
     } catch (e) { alert("Error: " + e.message); }
   };
-
   window.deleteAtt = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "AttendanceRecords", id)); };
   window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
 
-document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", () => {
     const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
-
     if (loggedUser) {
-        
         if (loggedUser.role !== "Founder") {
             const employeeLink = document.querySelector("a[href='employees.html']");
-            if (employeeLink) {
-                employeeLink.style.display = "none";
-            }
+            if (employeeLink) employeeLink.style.display = "none";
         }
     } else {
-        
         window.location.href = "login.html";
     }
-});
-  
+  });
 </script>
 </body>
 </html>

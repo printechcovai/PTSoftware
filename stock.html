@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <meta charset="UTF-8">
 <title>Stock Management</title>
@@ -30,8 +30,6 @@ body {
   max-height: calc(100vh - 50px); 
   overflow-y: auto;            
 }
-
-
 
 h2{
     display: inline-block;
@@ -435,22 +433,22 @@ select,input{
 </div>
 
 <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:20px;">
-  <input type="text" id="itemName" placeholder="Item Name" readonly>
-  <input type="number" id="available" placeholder="Available">
-  <input type="number" id="required" placeholder="Required">
+      <input type="text" id="itemName" placeholder="Item Name" readonly>
+      <input type="text" id="fromShop" placeholder="From (Shop Name)">
+      <input type="number" id="required" placeholder="Required">
+    </div>
+
+    <button class="save-btn" onclick="saveStock()">Place Order</button>
+
+    <hr style="margin:30px 0">
+    <div id="list"></div>
+    <button class="save-btn" style="background: #1aa853; margin-left: 10px;" onclick="exportStock()">📥 Export Stock List</button>
+  </div>
 </div>
 
-<button class="save-btn" onclick="saveStock(event)">Place Order</button>
-
-<hr style="margin:30px 0">
-<div id="list"></div>
-<button class="save-btn" style="background: #1aa853; margin-left: 10px;" onclick="exportStock()">📥 Export Stock List</button>
-</div>
-</div>
 <script type="module">
-
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, onSnapshot, query, doc, updateDoc, deleteDoc, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, doc, updateDoc, deleteDoc, orderBy, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC3yLs6Zx_JuCtGIPVKSrY9gse3ZkAi3Fs",
@@ -465,113 +463,76 @@ select,input{
   const db = getFirestore(app);
   const stockCol = collection(db, "StockData");
 
+  const getLoggedUser = () => JSON.parse(sessionStorage.getItem("loggedUser"));
   const getUsername = () => {
-    try {
-      const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
-      return loggedUser ? (loggedUser.user || loggedUser.name) : "Admin";
-    } catch(e) { return "Admin"; }
+    const user = getLoggedUser();
+    return user ? (user.user || user.name) : "Admin";
   };
 
+  // Sidebar Role Logic
+  window.addEventListener('DOMContentLoaded', () => {
+    const user = getLoggedUser();
+    if (user && user.role !== "Founder") {
+      const empLink = document.getElementById("empLink");
+      if (empLink) empLink.style.display = 'none';
+    }
+  });
+
   window.setItemName = (sel) => {
-    const itemNameInput = document.getElementById("itemName");
     if (sel.value !== "") {
-      const category = sel.options[0].text; 
-      itemNameInput.value = category + " : " + sel.value;
+      document.getElementById("itemName").value = sel.options[0].text + " : " + sel.value;
       document.querySelectorAll("select").forEach(s => { if (s !== sel) s.value = ""; });
     }
   };
 
-  window.saveStock = async (e) => {
-    if (e) e.preventDefault(); 
+  window.saveStock = async () => {
     const name = document.getElementById("itemName").value;
-    const avl = document.getElementById("available").value;
+    const from = document.getElementById("fromShop").value;
     const req = document.getElementById("required").value;
-    if (!name || !avl || !req) return alert("Fill the Details!");
+    if (!name || !from || !req) return alert("Machi, details fill pannu!");
+
     try {
       const now = new Date();
-      const timeStr = now.toLocaleDateString('en-GB') + " " + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       await addDoc(stockCol, {
-        item: name, avl: parseInt(avl), req: parseInt(req),
-        status: parseInt(avl) < parseInt(req) ? "Low" : "OK",
+        item: name, fromShop: from, req: parseInt(req),
         addedBy: getUsername(), followedBy: "", done: false,
-        dateTime: timeStr, timestamp: now
+        dateTime: now.toLocaleString('en-GB'), timestamp: now
       });
-      alert("Order Placed Successfully!");
+      alert("Order Placed! 📦");
       document.getElementById("itemName").value = "";
-      document.getElementById("available").value = "";
+      document.getElementById("fromShop").value = "";
       document.getElementById("required").value = "";
-    } catch (error) { alert("Error: " + error.message); }
+    } catch (e) { alert("Error: " + e.message); }
   };
 
-  window.exportStock = async () => {
-    try {
-        const snap = await getDocs(query(stockCol, orderBy("timestamp", "desc")));
-        if (snap.empty) return alert("Details Empty!");
-        let csvContent = "Item Name,Available,Required,Status,Added By,Followed By,Date Time\n";
-        snap.forEach(docSnap => {
-            const s = docSnap.data();
-            const statusText = s.done ? "DONE" : (s.followedBy ? "In Progress" : s.status);
-            csvContent += `"${s.item}",${s.avl},${s.req},${statusText},${s.addedBy},${s.followedBy || ''},${s.dateTime}\n`;
-        });
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `Stock_Report.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    } catch (e) { alert("Export error!"); }
+  window.followStock = async (id) => { 
+    await updateDoc(doc(db, "StockData", id), { followedBy: getUsername() }); 
   };
 
-  window.followStock = async (id) => { await updateDoc(doc(db, "StockData", id), { followedBy: getUsername() }); };
-  window.markAsDone = async (id, itemName) => {
-    const amtInput = document.getElementById(`amt-${id}`);
-    const amount = parseFloat(amtInput.value);
-
-    
-    if (amtInput && (isNaN(amount) || amount <= 0)) {
-        return alert("Please enter a valid amount!");
-    }
+  window.markAsDone = async (id, itemName, shopName) => {
+    const amt = document.getElementById(`amt-${id}`).value;
+    if (!amt || amt <= 0) return alert("Amount enter pannu machi!");
 
     try {
-        const now = new Date();
-        const dateStr = now.getDate().toString().padStart(2,'0') + "/" +
-                        (now.getMonth()+1).toString().padStart(2,'0') + "/" +
-                        now.getFullYear();
-        const rawDate = now.toISOString().split('T')[0];
+      const now = new Date();
+      // 1. Mark as Done
+      await updateDoc(doc(db, "StockData", id), { done: true });
+      // 2. Send to Expenses with Shop Name from Stock
+      await setDoc(doc(db, "ExpensesData", `Stock-${Date.now()}`), {
+        shop: shopName, // Inga dhaan 'From' shop name vizhum
+        item: itemName,
+        amount: Number(amt),
+        date: now.toLocaleDateString('en-GB'),
+        rawDate: now.toISOString().split('T')[0],
+        addedBy: getUsername(),
+        isPaid: false,
+        timestamp: now
+      });
+      alert("Done! Added to Expenses. 💸");
+    } catch (e) { alert("Error!"); }
+  };
 
-       
-        await updateDoc(doc(db, "StockData", id), { 
-            done: true, 
-            status: "OK" 
-        });
-
-        
-        if (amtInput) {
-            const expCol = collection(db, "ExpensesData");
-            await addDoc(expCol, {
-                shop: "Stock Purchase", 
-                item: itemName,
-                amount: amount,
-                date: dateStr,
-                rawDate: rawDate,
-                addedBy: getUsername(),
-                approvedBy: "",
-                paidBy: "",
-                isPaid: false,
-                timestamp: now
-            });
-            alert("Stock Updated & Added to Expenses! ✅");
-        } else {
-            alert("Stock Marked as Done! ✅");
-        }
-    } catch (e) {
-        alert("Error: " + e.message);
-    }
-};
-  window.deleteStock = async (id) => { if (confirm("Are you sure Do you want delete this data?")) await deleteDoc(doc(db, "StockData", id)); };
-  window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
+  window.deleteStock = async (id) => { if (confirm("Delete panna va?")) await deleteDoc(doc(db, "StockData", id)); };
 
   onSnapshot(query(stockCol, orderBy("timestamp", "desc")), (snap) => {
     const listDiv = document.getElementById("list");
@@ -579,53 +540,36 @@ select,input{
     snap.forEach(docSnap => {
       const s = docSnap.data();
       const id = docSnap.id;
-      let borderCol = s.done ? "#28a745" : (s.followedBy ? "#11a9cf" : "#ff4444");
+      const safeItem = s.item.replace(/'/g, "\\'");
+      const safeShop = (s.fromShop || "Unknown").replace(/'/g, "\\'");
+
+      let statusCol = s.done ? "#28a745" : (s.followedBy ? "#11a9cf" : "#ff4444");
+
       listDiv.innerHTML += `
-        <div style="background:white; margin-bottom:15px; padding:20px; border-radius:12px; border-left:10px solid ${borderCol}; display:grid; grid-template-columns: 2fr 1fr 1.5fr; align-items:center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-          
+        <div class="stock-card" style="border-left: 10px solid ${statusCol}; background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:10px; display:grid; grid-template-columns: 2fr 1fr 1.5fr; align-items:center;">
           <div>
-            <h4 style="margin:0 0 5px 0; color:#333; font-size:17px;">${s.item}</h4>
-            <p style="margin:0; font-size:14px; color:#666;">Available: <b>${s.avl}</b> | Required: <b>${s.req}</b></p>
-            <p style="margin:5px 0 0 0; font-size:11px; color:#999;">By: ${s.addedBy}</p>
+            <h4 style="margin:0; color:#333;">${s.item}</h4>
+            <p style="margin:5px 0; font-size:13px; color:#666;">From: <b>${s.fromShop}</b> | Qty: <b>${s.req}</b></p>
+            <small style="color:#999;">By: ${s.addedBy}</small>
           </div>
-
           <div style="text-align:center;">
-            ${s.done ? 
-                '<b style="color:#28a745; font-size:14px; background:#e8f5e9; padding:5px 12px; border-radius:15px;">👍 DONE</b>' : 
-                (s.followedBy ? 
-                    `<div style="display:flex; flex-direction:column; align-items:center;">
-                        <b style="color:#11a9cf; font-size:13px; background:#e1f5fe; padding:4px 10px; border-radius:15px; margin-bottom:4px;">In Progress</b>
-                        <small style="font-size:10px; color:#555;">Followed: ${s.followedBy}</small>
-                    </div>` : 
-                    (s.status=='Low' ? '<b style="color:#ff4444; font-size:13px; background:#ffebee; padding:5px 12px; border-radius:15px;">LOW STOCK</b>' : '<b style="color:#28a745; font-size:13px; background:#e8f5e9; padding:5px 12px; border-radius:15px;">OK</b>')
-                )
-            }
+            ${s.done ? '<b style="color:#28a745;">✓ DONE</b>' : (s.followedBy ? '<b style="color:#11a9cf;">In Progress</b>' : '<b style="color:#ff4444;">Pending</b>')}
           </div>
-
-          <div style="text-align:right;">
-            <div class="buttons" style="display:flex; justify-content:flex-end; gap:6px;">
-               ${!s.done && !s.followedBy ? `<button onclick="followStock('${id}')" style="background:#11a9cf; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px;">Follow</button>` : ''}
-               ${!s.done ? `<button onclick="markAsDone('${id}')" style="background:#82cd00; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px;">Done</button>` : ''}
-               <button onclick="deleteStock('${id}')" style="background:#ff4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px;">Del</button>
-            </div>
+          <div style="text-align:right; display:flex; gap:5px; justify-content:flex-end; align-items:center;">
+            ${!s.done && !s.followedBy ? `<button onclick="followStock('${id}')" style="background:#11a9cf; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Follow</button>` : ''}
+            
+            ${!s.done && s.followedBy ? `
+              <input type="number" id="amt-${id}" placeholder="₹ Amt" style="width:70px; padding:7px; border:1px solid #ccc; border-radius:5px;">
+              <button onclick="markAsDone('${id}', '${safeItem}', '${safeShop}')" style="background:#82cd00; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Done</button>
+            ` : ''}
+            
+            <button onclick="deleteStock('${id}')" style="background:#ff4444; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Del</button>
           </div>
-
         </div>`;
     });
   });
-  window.addEventListener('DOMContentLoaded', () => {
-    const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
-    
-    if (loggedUser) {
-      if (loggedUser.role !== "Founder") {
-        const accLink = document.querySelector('a[href="employees.html"]');
-        if (accLink) accLink.style.display = 'none';
-        if (expLink) expLink.style.display = 'none';
-      }
-    } else {
-     window.location.href = "login.html";
-    }
-  });
+
+  window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
 </script>
 </body>
 </html>
