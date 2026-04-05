@@ -5,7 +5,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <meta charset="UTF-8">
 <title>Stock Management</title>
-
 <style>
 html, body {
   height: 100%;
@@ -14,7 +13,7 @@ html, body {
 
 body {
   font-family: tahoma, sans-serif;
-  background: url('bgimg.jpeg');
+  background: url(bgdot.png);
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -442,7 +441,6 @@ select,input{
     <button class="save-btn" onclick="saveStock()">Place Order</button>
     <hr style="margin:30px 0">
     <div id="list"></div>
-    <button class="save-btn" style="background: #1aa853; margin-left: 10px;" onclick="exportStock()">📥 Export Stock List</button>
   </div>
 </div>
 
@@ -507,64 +505,86 @@ select,input{
   };
 
   window.markAsDone = async (id, itemName, shopName) => {
-    const amt = document.getElementById(`amt-${id}`).value;
-    if (!amt || amt <= 0) return alert("Enter the amount!");
+    const amtInput = document.getElementById(`amt-${id}`);
+    const amt = amtInput ? amtInput.value.trim() : "";
+
+    if (!amt || amt <= 0) {
+        return alert("Machi, amount-ah enter pannu! 💸");
+    }
 
     try {
-      const now = new Date();
-      await updateDoc(doc(db, "StockData", id), { done: true });
-      await setDoc(doc(db, "ExpensesData", `Stock-${Date.now()}`), {
-        shop: shopName, 
-        item: itemName,
-        amount: Number(amt),
-        date: now.toLocaleDateString('en-GB'),
-        rawDate: now.toISOString().split('T')[0],
-        addedBy: getUsername(),
-        isPaid: false,
-        timestamp: now
-      });
-      alert("Done! Added to Expenses. 💸");
-    } catch (e) { alert("Error!"); }
-  };
+        const now = new Date();
+        
+        const stockRef = doc(db, "StockData", id);
+        await updateDoc(stockRef, { 
+            done: true 
+        });
 
+        const dt = new Date();
+        const finalDate = dt.getDate().toString().padStart(2,'0') + "/" +
+                          (dt.getMonth()+1).toString().padStart(2,'0') + "/" +
+                          dt.getFullYear();
+
+        const expenseDocId = `Stock-${id}-${Date.now()}`.replace(/\s+/g, '');
+        const expenseRef = doc(db, "ExpensesData", expenseDocId);
+
+        await setDoc(expenseRef, {
+            shop: shopName, 
+            item: itemName,
+            amount: Number(amt),
+            date: finalDate, 
+            rawDate: now.toISOString().split('T')[0], 
+            addedBy: getUsername(),
+            approvedBy: "", 
+            paidBy: "", 
+            isPaid: false, 
+            timestamp: now
+        });
+
+        alert("Machi Done! Expense page-la check panni paaru. ✅");
+    } catch (e) { 
+        console.error("Full Error:", e);
+        alert("Error aayiduchi machi: " + e.message); 
+    }
+};
   window.deleteStock = async (id) => { if (confirm("Delete panna va?")) await deleteDoc(doc(db, "StockData", id)); };
 
-  onSnapshot(query(stockCol, orderBy("timestamp", "desc")), (snap) => {
+ onSnapshot(query(stockCol, orderBy("timestamp", "desc")), (snap) => {
     const listDiv = document.getElementById("list");
     listDiv.innerHTML = "";
     snap.forEach(docSnap => {
-      const s = docSnap.data();
-      const id = docSnap.id;
-      const safeItem = s.item.replace(/'/g, "\\'");
-      const safeShop = (s.fromShop || "Unknown").replace(/'/g, "\\'");
+  const s = docSnap.data();
+  const id = docSnap.id;
+  
+  const safeItem = s.item.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  const safeShop = (s.fromShop || "Unknown").replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
-      let statusCol = s.done ? "#28a745" : (s.followedBy ? "#11a9cf" : "#ff4444");
+  let statusCol = s.done ? "#28a745" : (s.followedBy ? "#11a9cf" : "#ff4444");
 
-      listDiv.innerHTML += `
-        <div class="stock-card" style="border-left: 10px solid ${statusCol}; background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:10px; display:grid; grid-template-columns: 2fr 1fr 1.5fr; align-items:center;">
-          <div>
-            <h4 style="margin:0; color:#333;">${s.item}</h4>
-            <p style="margin:5px 0; font-size:13px; color:#666;">From: <b>${s.fromShop}</b> | Qty: <b>${s.req}</b></p>
-            <small style="color:#999;">By: ${s.addedBy}</small>
-          </div>
-          <div style="text-align:center;">
-            ${s.done ? '<b style="color:#28a745;">✓ DONE</b>' : (s.followedBy ? '<b style="color:#11a9cf;">In Progress</b>' : '<b style="color:#ff4444;">Pending</b>')}
-          </div>
-          <div style="text-align:right; display:flex; gap:5px; justify-content:flex-end; align-items:center;">
-            ${!s.done && !s.followedBy ? `<button onclick="followStock('${id}')" style="background:#11a9cf; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Follow</button>` : ''}
-            
-            ${!s.done && s.followedBy ? `
-              <input type="number" id="amt-${id}" placeholder="₹ Amt" style="width:70px; padding:7px; border:1px solid #ccc; border-radius:5px;">
-              <button onclick="markAsDone('${id}', '${safeItem}', '${safeShop}')" style="background:#82cd00; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Done</button>
-            ` : ''}
-            
-            <button onclick="deleteStock('${id}')" style="background:#ff4444; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Del</button>
-          </div>
-        </div>`;
-    });
-  });
-
-  window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
+  listDiv.innerHTML += `
+    <div class="stock-card" style="border-left: 10px solid ${statusCol}; background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:10px; display:grid; grid-template-columns: 2fr 1fr 1.5fr; align-items:center;">
+      <div>
+        <h4 style="margin:0; color:#333;">${s.item}</h4>
+        <p style="margin:5px 0; font-size:13px; color:#666;">From: <b>${s.fromShop}</b> | Qty: <b>${s.req}</b></p>
+        <small style="color:#999;">By: ${s.addedBy}</small>
+      </div>
+      <div style="text-align:center;">
+        ${s.done ? '<b style="color:#28a745;">✓ DONE</b>' : (s.followedBy ? '<b style="color:#11a9cf;">In Progress</b>' : '<b style="color:#ff4444;">Pending</b>')}
+      </div>
+      <div style="text-align:right; display:flex; gap:5px; justify-content:flex-end; align-items:center;">
+        ${!s.done && !s.followedBy ? `<button onclick="followStock('${id}')" style="background:#11a9cf; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Follow</button>` : ''}
+        
+        ${!s.done && s.followedBy ? `
+          <input type="number" id="amt-${id}" placeholder="₹ Amt" style="width:70px; padding:7px; border:1px solid #ccc; border-radius:5px;">
+          <button onclick="markAsDone('${id}', \`${safeItem}\`, \`${safeShop}\`)" style="background:#82cd00; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Done</button>
+        ` : ''}
+        
+        <button onclick="deleteStock('${id}')" style="background:#ff4444; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Del</button>
+      </div>
+    </div>`;
+});
+});
+window.logout = () => { sessionStorage.clear(); window.location.href = "login.html"; };
 </script>
 </body>
 </html>

@@ -1,41 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <meta charset="UTF-8">
-<title>Dashboard</title>
+<title>Home page</title>
 <style>
 
     body {
     margin: 0;
     font-family: 'Times New Roman', Times, serif;
-    background: url('bgdot.jpeg');
-    background-size: cover;
-    background-position: center;
-    height: 100vh;
-}
+    background: url('bgdot.png') repeat; 
+    }
 
-   .content {
-    margin-left: 230px;
+.wave-container {
+    position: fixed;
+    top: 0;
+    left: 230px;
     width: calc(100% - 230px);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;     
-    align-items: center;       
-    padding: 0;                 
-    position: relative;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 0; 
+    pointer-events: none; 
 }
 
-   .content {
+.content {
     margin-left: 230px;
     width: calc(100% - 230px);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0;
+    position: relative;
+    z-index: 1; 
 }
+
 
 
 .home-box {
@@ -168,15 +167,6 @@
   font-family: Arial, sans-serif;
 }
 
-.wave-container {
-  position: fixed;
-  top: 0;
-  left: 230px;
-  width: calc(100% - 230px);
-  height: 100vh;
-  overflow: hidden;
-  z-index: -1;
-}
 
 .wave-track {
   position: absolute;
@@ -201,6 +191,8 @@
     transform: translateX(-50%);
   }
 }
+
+
 </style>
 </head>
 <body>
@@ -288,7 +280,6 @@
 
 onSnapshot(collection(db, "AttendanceRecords"), (snap) => {
     let presentStaffs = new Set();
-    
     const now = new Date();
     const offset = now.getTimezoneOffset();
     const adjustedDate = new Date(now.getTime() - (offset * 60 * 1000));

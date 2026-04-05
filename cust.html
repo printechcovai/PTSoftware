@@ -5,6 +5,7 @@
     <title>Customer Management - Printech</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
     <style>
         * {
              margin: 0;
@@ -355,7 +356,7 @@
         const total = parseFloat(document.getElementById("totalAmt").value) || 0;
         const adv = parseFloat(document.getElementById("advAmt").value) || 0;
 
-        if(!name || !orderNo) return alert("Customer Name and Order No are important!");
+        if(!name || !orderNo) return;
 
         const orderData = {
             name, orderNo, total, adv,
@@ -372,17 +373,14 @@
 
         try {
             await db.collection("SoftwareData").doc(orderNo).set(orderData);
-            location.reload();
-        } catch(e) { alert(e.message); }
-    };
-
-    document.getElementById("custName").onkeyup = function() {
-        let val = this.value.toUpperCase();
-        let rows = document.getElementsByClassName("orderRow");
-        for (let row of rows) {
-            let nameText = row.querySelector("b").innerText.toUpperCase();
-            row.style.display = nameText.includes(val) ? "" : "none";
-        }
+            document.getElementById("custName").value = "";
+            document.getElementById("orderNo").value = "";
+            document.getElementById("totalAmt").value = "";
+            document.getElementById("advAmt").value = "";
+            document.getElementById("mobileNo").value = "";
+            document.getElementById("printTypeInput").value = "";
+            document.getElementById("specialDetails").value = "";
+        } catch(e) { console.error(e.message); }
     };
 
     db.collection("SoftwareData").orderBy("timestamp", "desc").onSnapshot(snap => {
@@ -414,7 +412,7 @@
                             <div class="btn-group">${followUI}${deliveryUI}</div>
                             <div class="btn-group">
                                 <button class="btn-act btn-edit" onclick="editOrder('${id}', ${o.total}, ${o.adv})">Edit</button>
-                                <button class="btn-act btn-paid" onclick="markAsPaid('${id}', ${o.total})">Paid ✅</button>
+                                <button class="btn-act btn-paid" onclick="markAsPaid('${id}')">Paid ✅</button>
                                 <button class="btn-act btn-del" onclick="deleteOrder('${id}')">Del</button>
                             </div>
                         </div>
@@ -437,24 +435,25 @@
 
     window.markDelivered = async (id) => {
         const dDate = new Date().toLocaleDateString('en-GB');
-        await db.collection("SoftwareData").doc(id).update({ 
-            isDelivered: true,
-            deliveryDate: dDate 
-        });
+        await db.collection("SoftwareData").doc(id).update({ isDelivered: true, deliveryDate: dDate });
     };
 
-    window.markAsPaid = async (id, totalAmt) => {
+    window.markAsPaid = async (id) => {
         try {
             const docRef = db.collection("SoftwareData").doc(id);
-            const doc = await docRef.get();
-            if (doc.exists) {
-                const data = doc.data();
-                await db.collection("DeliveredOrders").doc(id).set({
-                    ...data,
-                    adv: totalAmt,
-                    balance: 0,
-                    isDelivered: true,
-                    deliveredAt: data.deliveryDate || new Date().toLocaleDateString('en-GB'), 
+            const docSnap = await docRef.get();
+
+            if (docSnap.exists) {
+                const data = docSnap.data();
+                await db.collection("DeliveredOrders").add({
+                    orderNo: data.orderNo || id,
+                    name: data.name || "N/A",
+                    mobile: data.mobile || "-",
+                    type: data.type || "-",
+                    total: parseFloat(data.total) || 0,
+                    details: data.details || "None",
+                    status: "PAID",
+                    deliveredAt: new Date().toLocaleDateString('en-GB'),
                     movedTimestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 await docRef.delete();
@@ -478,24 +477,10 @@
         }
     };
 
-    window.addEventListener('DOMContentLoaded', () => {
-    const loggedUser = JSON.parse(sessionStorage.getItem("loggedUser"));
-    
-    if (loggedUser) {
-      if (loggedUser.role !== "Founder") {
-        const accLink = document.querySelector('a[href="employees.html"]');
-         
-        if (accLink) accLink.style.display = 'none';
-        if (expLink) expLink.style.display = 'none';
-      }
-    } else {
-     window.location.href = "login.html";
-    }
-  });
-  window.logout = () => {
-    window.location.href = "login.html";
-  };
-
+    window.logout = () => {
+        sessionStorage.clear();
+        window.location.href = "login.html";
+    };
 </script>
 </body>
 </html> 

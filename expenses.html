@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <meta charset="UTF-8">
 <title>Expenses</title>
-
+<link rel="stylesheet" href="media.css">
 <style>
     body {
         margin: 0;
@@ -25,7 +25,6 @@
         margin-left: 10px;
         padding: 25px;
         border-radius: 12px;
-        
     }
 
     .form-row {
@@ -74,7 +73,6 @@
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 0 25px rgba(0,0,0,0.08);
-
   overflow-y: auto; 
 }
 
@@ -86,7 +84,6 @@
     font-size: 28px;
     margin-bottom: 30px;
     font-weight: bold;
-    
 }
 
   table {
@@ -94,7 +91,6 @@
         margin: auto;
         background: white;
         border-collapse: collapse;
-       
     }
 
     th {
@@ -188,6 +184,7 @@
     cursor: pointer; 
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
+
 * {
   margin: 0;
   padding: 0;
@@ -199,7 +196,7 @@ body {
   height: 100vh;
   background: #fff;
   background-image: url(bgdot.jpeg);
-justify-content: space-between;
+  justify-content: space-between;
 }
 
  .page {
@@ -241,7 +238,6 @@ justify-content: space-between;
   }
 }
 
-
 </style></head>
 <body>
     <div class="wave-container">
@@ -263,11 +259,11 @@ justify-content: space-between;
     <a href="accounts.html">Accounts</a>
     <a href="expenses.html">Expenses</a>
     <a href="customer_data.html">Customer Data</a><br><br><br><br>
-    
     <button onclick="logout()">Logout</button>
 </div>
+
 <div class="page-wrap">
-<div class="container">
+  <div class="container">
 <h2>Shop Expenses</h2>
 <div class="form-box">
 
@@ -283,16 +279,15 @@ justify-content: space-between;
 
     <button onclick="saveExpense()">Save</button>
 </div>
-
 <table>
     <thead>
         <tr>
-            <th>Shop Name</th>
-        <th>Item Name</th>
-        <th>Amount</th>
-        <th>Date</th>
-        <th>Added By</th> 
-        <th>Actions</th>
+          <th>Shop Name</th>
+          <th>Item Name</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Added By</th> 
+          <th>Actions</th>
         </tr>
     </thead>
 
@@ -324,7 +319,6 @@ justify-content: space-between;
     const user = JSON.parse(sessionStorage.getItem("loggedUser"));
     return user ? (user.user || user.name) : "Unknown";
   };
-
 
   window.exportExpenses = async () => {
     try {
@@ -453,7 +447,7 @@ justify-content: space-between;
         window.location.href = "login.html";
     }
   });
+  
 </script>
-
 </body>
 </html>

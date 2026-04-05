@@ -2,22 +2,103 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Delivered Data - Printech</title>
+    <title>Customer Data</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="media.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: tahoma, sans-serif; }
-        body { height: 100vh; background: #ffffff; background-image: url(bgdot.jpeg); overflow: hidden; }
-        .main-area { margin-left: 230px; height: 100vh; display: flex; justify-content: center; padding-top: 40px; position: relative; }
-        .container { width: 95%; background: #ffffff; padding: 40px; box-shadow: 0 0 25px rgba(0,0,0,0.08); border-radius: 12px; z-index: 10; overflow-y: auto; max-height: 90vh; }
-        h2 { display: inline-block; background: linear-gradient(to right, #07AFC0, #1aa853); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 28px; font-weight: bold; margin-bottom: 20px; }
-        #searchBox { width: 100%; padding: 12px; margin-bottom: 20px; border: 2px solid #1aa853; border-radius: 8px; outline: none; font-size: 16px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        thead th { background: #1aa853; color: white; padding: 15px; text-align: left; position: sticky; top: 0; font-size: 16px; }
-        tbody td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; }
-        tr:hover { background: #f1f8f1; }
-        .btn-del { background: #ff4d4d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
-        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: tahoma, sans-serif; 
+        }
+
+        body { 
+            height: 100vh; 
+            background: #ffffff; 
+            background-image: url(bgdot.jpeg);
+             overflow: hidden; 
+            }
+
+        .main-area { 
+            margin-left: 230px; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            padding-top: 40px; 
+            position: relative; 
+        }
+
+        .container { 
+            width: 95%; 
+            background: #ffffff; 
+            padding: 40px; 
+            box-shadow: 0 0 25px rgba(0,0,0,0.08); 
+            border-radius: 12px; 
+            z-index: 10; 
+            overflow-y: auto; 
+            max-height: 90vh; 
+        }
+
+        h2 { 
+            display: inline-block; 
+            background: linear-gradient(to right, #07AFC0, #1aa853); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            font-size: 28px; 
+            font-weight: bold; 
+            margin-bottom: 20px; 
+        }
+
+        #searchBox { 
+            width: 100%;
+             padding: 12px; 
+             margin-bottom: 20px; 
+             border: 2px solid #1aa853; 
+             border-radius: 8px; 
+             outline: none; 
+             font-size: 16px; 
+            }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 10px; 
+        }
+
+        thead th { 
+            background: #1aa853; 
+            color: white; 
+            padding: 15px; 
+            text-align: left; 
+            position: sticky; 
+            top: 0; 
+            font-size: 16px; 
+        }
+
+        tbody td { 
+            padding: 15px; 
+            border-bottom: 1px solid #eee; 
+            font-size: 14px; 
+            color: #333; 
+        }
+
+        tr:hover { 
+            background: #f1f8f1; 
+        }
+
+        .btn-del { 
+            background: #ff4d4d; 
+            color: white; 
+            border: none; 
+            padding: 6px 12px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 12px; 
+            font-weight: bold; 
+        }
         
         .status-paid {
             color: #1aa853;
@@ -28,20 +109,93 @@
             font-size: 12px;
         }
 
-        .sidebar { width: 230px; height: 100vh; position: fixed; left: 0; top: 0; background: #26bfa3; padding-top: 20px; z-index: 100; }
-        .ptimg { margin: 0 auto 30px auto; width: 180px; height: 80px; background: #ffffff; border-radius: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .ptimg img { width: 150px; }
-        .sidebar a { display: block; padding: 12px 25px; text-decoration: none; color: white; font-size: 16px; transition: 0.3s; font-weight: 500; }
-        .sidebar a:hover { background: rgba(255, 255, 255, 0.2); padding-left: 35px; }
-        .sidebar button { display: block; width: 80%; padding: 12px; margin: 40px auto; background: white; color: #26bfa3; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .wave-container { position: fixed; top: 0; left: 230px; width: calc(100% - 230px); height: 100vh; overflow: hidden; z-index: -1; }
-        .wave-track { position: absolute; bottom: 7%; display: flex; width: 200%; animation: waveMove 35s linear infinite; }
-        .wave { width: 100%; height: auto; flex-shrink: 0; }
-        @keyframes waveMove { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .sidebar { 
+            width: 230px; 
+            height: 100vh; 
+            position: fixed; 
+            left: 0; top: 0; 
+            background: #26bfa3; 
+            padding-top: 20px; 
+            z-index: 100; 
+        }
+
+        .ptimg { 
+            margin: 0 auto 30px auto; 
+            width: 180px; 
+            height: 80px; 
+            background: #ffffff; 
+            border-radius: 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+        }
+
+        .ptimg img { 
+            width: 150px; 
+        }
+
+        .sidebar a { 
+            display: block; 
+            padding: 12px 25px; 
+            text-decoration: none; 
+            color: white; 
+            font-size: 16px; 
+            transition: 0.3s; 
+            font-weight: 500; 
+        }
+
+        .sidebar a:hover { 
+            background: rgba(255, 255, 255, 0.2); 
+            padding-left: 35px; 
+        }
+
+        .sidebar button { 
+            display: block; 
+            width: 80%; 
+            padding: 12px; 
+            margin: 40px auto; 
+            background: white; 
+            color: #26bfa3; 
+            font-weight: bold; 
+            border-radius: 10px; 
+            border: none; 
+            cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .wave-container { 
+            position: fixed; 
+            top: 0; 
+            left: 230px; 
+            width: calc(100% - 230px); 
+            height: 100vh; 
+            overflow: hidden; 
+            z-index: -1; 
+        }
+
+        .wave-track { 
+            position: absolute; 
+            bottom: 7%; 
+            display: flex; 
+            width: 200%; 
+            animation: waveMove 35s linear infinite; 
+        }
+
+        .wave { 
+            width: 100%; 
+            height: auto; 
+            flex-shrink: 0; 
+        }
+        
+        @keyframes waveMove { 
+            0% { transform: translateX(0); } 
+            100% { transform: translateX(-50%); } 
+        }
+
     </style>
 </head>
 <body>
-
 <div class="wave-container">
   <div class="wave-track">
     <img src="Software.png" class="wave">
@@ -68,7 +222,11 @@
     <div class="container">
         <h2>Delivered Customer Data</h2>
         <input type="text" id="searchBox" placeholder="Search by Name or Order No..." onkeyup="searchTable()">
-        
+<div style="display: flex; gap: 10px; margin-bottom: 20px;">
+    <button onclick="exportToExcel()" style="background: #1aa853; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+        📥 Export Excel
+    </button>
+</div>
         <table>
             <thead>
                 <tr>
@@ -76,6 +234,7 @@
                     <th>Customer Name</th>
                     <th>Mobile</th>
                     <th>Printing Type</th>
+                    <th>Special Details</th>
                     <th>Amount</th>
                     <th>Status</th> <th>Delivered Date</th>
                     <th>Action</th>
@@ -99,26 +258,27 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    db.collection("DeliveredOrders").orderBy("movedTimestamp", "desc").onSnapshot(snap => {
-        const tbody = document.getElementById("deliveredRows");
-        tbody.innerHTML = "";
-        
-        snap.forEach(docSnap => {
-            const o = docSnap.data();
-            const id = docSnap.id;
-            
-            tbody.innerHTML += `
-                <tr class="dataRow">
-                    <td><b>#${o.orderNo}</b></td>
-                    <td>${o.name}</td>
-                    <td>${o.mobile || '-'}</td>
-                    <td>${o.type || '-'}</td>
-                    <td>₹${o.total || 0}</td>
-                    <td><span class="status-paid">PAID</span></td> <td>${o.deliveredAt || 'N/A'}</td>
-                    <td><button class="btn-del" onclick="deleteHistory('${id}')">Delete</button></td>
-                </tr>`;
-        });
-    });
+   db.collection("DeliveredOrders").orderBy("movedTimestamp", "desc").onSnapshot(snap => {
+    const tbody = document.getElementById("deliveredRows");
+    tbody.innerHTML = "";
+
+snap.forEach(docSnap => {
+    const o = docSnap.data();
+    const id = docSnap.id;
+    
+    tbody.innerHTML += `
+        <tr class="dataRow">
+            <td><b>#${o.orderNo || 'N/A'}</b></td>
+            <td>${o.name || 'N/A'}</td>
+            <td>${o.mobile || '-'}</td>
+            <td>${o.type || '-'}</td>
+            <td style="color: #666; font-style: italic;">${o.details || '-'}</td> <td>₹${o.total || 0}</td>
+            <td><span class="status-paid">PAID</span></td> 
+            <td>${o.deliveredAt || 'N/A'}</td>
+            <td><button class="btn-del" onclick="deleteHistory('${id}')">Delete</button></td>
+        </tr>`;
+});
+});
 
     window.deleteHistory = async (id) => {
         if(confirm("Record-ah delete panna va machi?")) {
@@ -153,6 +313,43 @@
         sessionStorage.clear();
         window.location.href = "login.html";
     };
+    window.exportToExcel = async () => {
+    try {
+        const snap = await db.collection("DeliveredOrders").orderBy("movedTimestamp", "desc").get();
+        if (snap.empty) return alert("Export panna data illa machi!");
+
+        const data = [];
+        snap.forEach(docSnap => {
+            const o = docSnap.data();
+            data.push({
+                "Order #": o.orderNo || "N/A",
+                "Customer Name": o.name || "N/A",
+                "Mobile": o.mobile || "-",
+                "Printing Type": o.type || "-",
+                "Special Details": o.details || "-",
+                "Amount": o.total || 0,
+                "Status": "PAID",
+                "Delivered Date": o.deliveredAt || "N/A"
+            });
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Delivered Orders");
+
+        const wscols = [
+            {wch: 10}, {wch: 25}, {wch: 15}, {wch: 20}, {wch: 30}, {wch: 10}, {wch: 10}, {wch: 15}
+        ];
+        worksheet['!cols'] = wscols;
+
+        const fileName = `Printech_Report_${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+
+    } catch (e) {
+        console.error(e);
+        alert("Chinna issue machi: " + e.message);
+    }
+};
 </script>
 </body>
 </html>

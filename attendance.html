@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>Attendance</title>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 body {
     margin: 0;
@@ -11,7 +11,7 @@ body {
     height: 100vh;
     overflow: hidden;
 
-    background: url("bgdot.jpeg") repeat;
+    background: url("bgdot.png") repeat;
 }
 .container {
     width: 900px;
@@ -257,10 +257,14 @@ h2 {
 
     <div class="btnRow">
         <button id="inBtn">IN</button>
-    </div>
-
+    </div><br>
+<div class="btnRow">
+    <button onclick="exportToExcel()" style="background: #198a4b;">Export to Excel</button>
+</div>
     <div id="attendanceList"></div>
 </div>
+
+
 </div>
 
 <script type="module">
@@ -390,6 +394,34 @@ h2 {
         window.location.href = "login.html";
     }
   });
+
+window.exportToExcel = () => {
+    if (allAttendance.length === 0) return alert("Export panna data illa machi!");
+
+    const excelData = allAttendance.map(d => ({
+        "Employee Name": d.employeeName,
+        "Date": d.date ? d.date.split("-").reverse().join("/") : "-",
+        "IN Time": d.inTime,
+        "OUT Time": d.outTime,
+        "Lunch OUT": d.lunchOut || "-",
+        "Lunch IN": d.lunchIn || "-",
+        "Lunch Duration": d.lunchDuration || "-",
+        "Status": d.status
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance Report");
+
+    const wscols = [
+        {wch: 20}, {wch: 15}, {wch: 15}, {wch: 15}, 
+        {wch: 15}, {wch: 15}, {wch: 15}, {wch: 10}
+    ];
+    worksheet['!cols'] = wscols;
+
+    const fileName = `Attendance_Report_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+};
 </script>
 </body>
 </html>

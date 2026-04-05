@@ -3,16 +3,17 @@
 <head>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <meta charset="UTF-8">
 <title>Accounts</title>
-
+<link rel="stylesheet" href="media.css">
 <style>
   html, body {
   height: 100%;
   margin: 0;
   overflow-x: hidden; 
   font-family: Tahoma, sans-serif;
-  background-image: url(bgdot.jpeg);
+  background-image: url(bgdot.png);
 }
 .container {
     position: relative;
@@ -321,30 +322,50 @@ table td {
     return user ? (user.user || user.name) : "Unknown";
   };
 
-  window.exportAccounts = async () => {
+ window.exportAccounts = async () => {
     try {
         const snap = await getDocs(query(accCol, orderBy("timestamp", "desc")));
-        if (snap.empty) return alert(" Accounts data's is empty!");
+        if (snap.empty) return alert("Accounts data is empty!");
 
-        let csvContent = "Agent Name,Job Detail,Amount,Mobile,Added By,Followed By,Done By,Status\n";
-        
+        const excelData = [];
         snap.forEach(docSnap => {
             const d = docSnap.data();
-            let status = d.isDone ? "Completed" : (d.followBy ? "In Progress" : "Pending");
-            csvContent += `"${d.agent}","${d.job}","${d.amount}","${d.mobile}","${d.addedBy}","${d.followBy || ''}","${d.doneBy || ''}","${status}"\n`;
+            let status = d.isDone ? "Completed" : (d.followBy ? "Paid" : "Pending");
+            
+            excelData.push({
+                "Agent Name": d.agent || "-",
+                "Job Detail": d.job || "-",
+                "Amount (Rs.)": d.amount || 0,
+                "Mobile Number": d.mobile || "-",
+                "Added By": d.addedBy || "-",
+                "Paid Status By": d.followBy || "-",
+                "Status": status
+            });
         });
 
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `Printech_Accounts_Report.csv`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        alert("Account Report Exported! ✅");
-    } catch (e) { alert("Export Error: " + e.message); }
-  };
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Accounts Report");
+
+        const wscols = [
+            {wch: 20}, 
+            {wch: 25}, 
+            {wch: 15}, 
+            {wch: 15}, 
+            {wch: 15}, 
+            {wch: 15}, 
+            {wch: 12}  
+        ];
+        worksheet['!cols'] = wscols;
+
+        const fileName = `Printech_Accounts_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+        
+        alert("Account Excel Report Exported! ✅");
+    } catch (e) { 
+        alert("Export Error: " + e.message); 
+    }
+};
 
   window.saveAccount = async () => {
     const a = document.getElementById("agent").value.trim();
@@ -405,7 +426,7 @@ table td {
       const currentUser = getLoggedUser();
 
       let followText = d.followBy ? `<span style="color:#07AFC0; font-size:12px;">👤 ${d.followBy}</span>` : 
-                       `<button onclick="updateAccountStatus('${id}', {followBy: '${currentUser}'})" style="background:#07AFC0; color:white; padding:6px; font-size:10px; border:none; border-radius:4px; cursor:pointer;">Follow</button>`;
+                       `<button onclick="updateAccountStatus('${id}', {followBy: '${currentUser}'})" style="background:#07AFC0; color:white; padding:6px; font-size:10px; border:none; border-radius:4px; cursor:pointer;">Paid</button>`;
       
     
       accTable.innerHTML += `
