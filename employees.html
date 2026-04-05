@@ -5,13 +5,13 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <meta charset="UTF-8">
 <title>Employee Management</title>
-<link rel="stylesheet" href="media.css">
 <style>
 
 body {
-    margin: 0;
-    font-family: tahoma, sans-serif;
-    background: #ffffff;
+   margin: 0;
+    font-family: 'Times New Roman', Times, serif;
+   background: url("bgdot.png") repeat; 
+    overflow-x: hidden;
 }
 
 .main-content {
@@ -132,15 +132,15 @@ p {
     font-size: 16px;
 }
 
-.sidebar {
-    width: 230px;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    background: linear-gradient(#34caca, #1aa853); 
-    padding-top: 30px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+.sidebar { 
+    width: 230px; 
+    height: 100vh; 
+    position: fixed; 
+    left: 0; 
+    top: 0; 
+    background: #26bfa3; 
+    padding-top: 20px; 
+    z-index: 100; 
 }
 
 .sidebar a { 
@@ -158,18 +158,18 @@ p {
     padding-left: 35px; 
 }
 
-.sidebar button {
-    display: block;
-    padding: 12px 20px;
-    margin: 10px 15px;
-    text-decoration: none;
-    font-size: 16px;
-    transition: 0.3s;
-    background: white;
-    color: #26bfa3;
-    border-radius: 30px;
-    border: none;
-    font-weight: bold;
+.sidebar button { 
+    display: block; 
+    width: 80%; 
+    padding: 12px; 
+    margin: 40px auto; 
+    background: white; 
+    color: #26bfa3; 
+    font-weight: bold; 
+    border-radius: 10px; 
+    border: none; 
+    cursor: pointer; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 * {
@@ -219,21 +219,22 @@ justify-content: space-between;
   }
 }
 
-.ptimg{
-    margin-left: 30px;
-    width: 70%;
-    
-    border-radius: 12px;
-    background: #ffffff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+.ptimg { 
+    margin: 0 auto 30px auto; 
+    width: 180px; 
+    height: 80px;
+    background: #ffffff; 
+    border-radius: 15px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-.sidebar img {
-        width: 150px;
-        height: auto;
-        padding: 12px 20px;
-        margin-left: 5px;
-        align-items: center;  
+
+.ptimg img { 
+    width: 150px; 
 }
+
 </style>
 <body>
     <div class="wave-container">
